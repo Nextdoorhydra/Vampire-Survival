@@ -8,7 +8,7 @@
 # 프로젝트 시작
 
 ```
-1. git clone https://github.com/Carrymachine/NBC-SideProject-1.git
+1. git clone https://github.com/NBC-SideProject/Vampire-Survival.git
 
 2. clone된 폴더에서 .uproject 더블클릭 > 언리얼 에디터 빌드 1회 실행
 
