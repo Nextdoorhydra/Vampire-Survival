@@ -13,6 +13,8 @@
 2. clone된 폴더에서 .uproject 더블클릭 > 언리얼 에디터 빌드 1회 실행
 
 3. 빌드 완료 후 에디터 종료 > .uproject 연결프로그램 Rider로 다시 빌드
+
+4. git lfs install 필수!
 ```
 
 
