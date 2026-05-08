@@ -22,9 +22,6 @@
 
 # Git branch 전략
 
-## main
-최종 프로덕션 브랜치
-
 ## dev
 개발 기준 브랜치
 모든 서브 브랜치는 dev를 기준으로 branch 생성 > merge dev
