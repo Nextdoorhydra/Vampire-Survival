@@ -1,34 +1,81 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Enemy/EnemyBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
-// Sets default values
 AEnemyBase::AEnemyBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
-// Called when the game starts or when spawned
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CurrentHP = MaxHP; // 체력초기화
+
+	TargetActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);  // 플레이어 찾기
 }
 
-// Called every frame
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsDead)
+	{
+		return;
+	}
+	
+	if (TargetActor == nullptr)
+	{
+		return;
+	}
+	
+	FVector Direction = TargetActor->GetActorLocation() - GetActorLocation();
+	Direction.Z = 0.f;
+	Direction = Direction.GetSafeNormal();
+	
+	FVector NewLocation = GetActorLocation() + Direction * MoveSpeed * DeltaTime;
+	SetActorLocation(NewLocation);
 }
 
-// Called to bind functionality to input
-void AEnemyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+float AEnemyBase::TakeDamage(
+	float DamageAmount,
+	FDamageEvent const& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser
+)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (bIsDead)
+	{
+		return 0.f;
+	}
 
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (ActualDamage <= 0.f)
+	{
+		return 0.f;
+	}
+
+	CurrentHP -= ActualDamage;
+
+	if (CurrentHP <= 0.f)
+	{
+		CurrentHP = 0.f;
+		Die();
+	}
+
+	return ActualDamage;
 }
 
+void AEnemyBase::Die()
+{
+	if (bIsDead)
+	{
+		return;
+	}
+
+	bIsDead = true;
+
+	Destroy();
+}
