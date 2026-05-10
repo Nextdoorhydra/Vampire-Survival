@@ -17,12 +17,16 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
 	virtual float TakeDamage(
 		float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator,
 		AActor* DamageCauser
 	) override;
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy|Test")
+	void TestTakeDamage(float DamageAmount);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Stats")
@@ -34,11 +38,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Stats")
 	float ContactDamage = 10.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|State")
-	bool bIsDead = false;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Movement")
 	float MoveSpeed = 300.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|State")
+	bool bIsDead = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Target")
 	AActor* TargetActor = nullptr;
