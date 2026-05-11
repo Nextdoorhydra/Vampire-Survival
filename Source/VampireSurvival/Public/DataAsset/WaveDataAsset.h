@@ -21,9 +21,6 @@ struct FEnemySpawnGroup
 	float SpawnWeight = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
-	float HPScale = 1.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	int32 CountPerSpawn = 1;
 };
 

@@ -81,7 +81,7 @@ private:
 	const FEnemySpawnGroup* SelectEnemySpawnGroup(const FSpawnSegment& Segment) const;
 	
 	void SpawnEnemyFromGroup(const FEnemySpawnGroup& SpawnGroup);
-	void SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, float HPScale, int32 Count);
+	void SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 Count);
 	
 	// Spawn 가능한지 체크
 	bool FindSpawnLocation(FVector& SpawnLocation) const;

@@ -159,12 +159,11 @@ void AEnemySpawner::SpawnEnemyFromGroup(const FEnemySpawnGroup& SpawnGroup)
 {
 	SpawnEnemyFromData(
 		SpawnGroup.EnemyData,
-		SpawnGroup.HPScale,
 		SpawnGroup.CountPerSpawn
 		);
 }
 
-void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, float HPScale, int32 Count)
+void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 Count)
 {
 	if (!EnemyData || !EnemyData->EnemyClass)
 	{
@@ -215,7 +214,7 @@ void AEnemySpawner::SpawnBoss()
 		return;
 	}
 	
-	SpawnEnemyFromData(CurrentWaveData->BossEnemyDataAsset, 1.f, 1);
+	SpawnEnemyFromData(CurrentWaveData->BossEnemyDataAsset, 1);
 }
 
 
