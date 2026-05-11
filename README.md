@@ -43,6 +43,9 @@ dev > switch -c <sub-branch-name>
 - docs/~
 > 문서 추가/삭제/수정 시 
 
+- refac/~
+> 폴더구조, 기능 등 리팩토링 시
+
 - ci/~
 > workflow 수정 시
 
@@ -69,11 +72,15 @@ asd
 - docs: ~
 > 문서 추가/삭제/수정 시 
 
+- refac/~
+> 폴더구조, 기능 등 리팩토링 시
+
 - ci: ~
 > workflow 수정 시
 
 - hotfix: ~
 > dev branch 건너뛰고 즉시 main branch merge 필요할 경우
+
 
 
 # Git LFS
