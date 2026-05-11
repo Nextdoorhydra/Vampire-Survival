@@ -1,10 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Component/Attack/SimpleAttackComponent.h"
+#include "Component/SimpleAttackComponent.h"
 
 
-// Sets default values
 USimpleAttackComponent::USimpleAttackComponent()
 {
 	

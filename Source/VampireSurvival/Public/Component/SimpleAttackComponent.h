@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Component/Attack/AttackBaseComponent.h"
+#include "AttackBaseComponent.h"
+
 #include "SimpleAttackComponent.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
