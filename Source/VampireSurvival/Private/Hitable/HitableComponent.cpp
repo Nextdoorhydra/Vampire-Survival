@@ -38,7 +38,7 @@ void UHitableComponent::SetHP(float Amount)
 
 void UHitableComponent::AddHP(float Amount)
 {
-	CurrentHP -= Amount;
+	CurrentHP += Amount;
 	OnHPChanged();
 }
 
