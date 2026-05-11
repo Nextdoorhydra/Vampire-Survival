@@ -2,10 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Hitable/IHitable.h"
 #include "EnemyBase.generated.h"
 
+class UHitableComponent;
+
 UCLASS()
-class VAMPIRESURVIVAL_API AEnemyBase : public ACharacter
+class VAMPIRESURVIVAL_API AEnemyBase : public ACharacter, public IHitable
 {
 	GENERATED_BODY()
 
@@ -17,23 +20,16 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-
-	virtual float TakeDamage(
-		float DamageAmount,
-		struct FDamageEvent const& DamageEvent,
-		class AController* EventInstigator,
-		AActor* DamageCauser
-	) override;
-
-	UFUNCTION(BlueprintCallable, Category = "Enemy|Test")
-	void TestTakeDamage(float DamageAmount);
+	
+	virtual void TakeDamage(float Damage_, AActor* Attacker) override;
+	virtual void Death() override;
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
+	TObjectPtr<UHitableComponent> HitableComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Stats")
 	float MaxHP = 100.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Stats")
-	float CurrentHP = 100.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Stats")
 	float ContactDamage = 10.f;
@@ -41,12 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Movement")
 	float MoveSpeed = 300.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|State")
-	bool bIsDead = false;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Target")
 	AActor* TargetActor = nullptr;
-
-protected:
-	void Die();
+	
 };
