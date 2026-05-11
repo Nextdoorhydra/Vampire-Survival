@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "ABulletBase.h"
-#include "Component/Attack/AttackBaseComponent.h"
+
 #include "Components/SphereComponent.h"
 
 #include "GameFramework/Actor.h"
 #include "SimpleBullet.generated.h"
+
+class UAttackBaseComponent;
 
 UCLASS()
 class VAMPIRESURVIVAL_API ASimpleBullet : public ABulletBase

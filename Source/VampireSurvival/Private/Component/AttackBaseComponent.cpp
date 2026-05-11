@@ -1,11 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Component/Attack/AttackBaseComponent.h"
+#include "Component/AttackBaseComponent.h"
 
-#include "Hitable/IHitable.h"
-
-
+#include "Entity/IHitable.h"
 // Sets default values
 UAttackBaseComponent::UAttackBaseComponent()
 {

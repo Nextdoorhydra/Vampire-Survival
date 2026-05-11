@@ -1,13 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Component/Weapon/Bullet/SimpleBullet.h"
+
 // #include "Weapon/Bullet/SimpleBullet.h"
 //
 // #include "Attack/SimpleAttackComponent.h"
-#include "Component/Attack/SimpleAttackComponent.h"
+#include "Entity/Character/Weapon/Bullet/SimpleBullet.h"
+
+
+#include "Component/SimpleAttackComponent.h"
 #include "Components/SphereComponent.h"
-#include "Hitable/IHitable.h"
+#include "Entity/IHitable.h"
 
 
 ASimpleBullet::ASimpleBullet()

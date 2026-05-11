@@ -1,8 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Entity/IHitable.h"
 #include "GameFramework/Character.h"
-#include "Hitable/IHitable.h"
+
 #include "EnemyBase.generated.h"
 
 class UHitableComponent;
