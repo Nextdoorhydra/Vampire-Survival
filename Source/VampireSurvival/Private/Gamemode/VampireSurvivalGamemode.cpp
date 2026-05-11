@@ -121,7 +121,7 @@ void AVampireSurvivalGamemode::SetCurrentWave(UWaveDataAsset* NewWave)
 
 	if (EnemySpawner)
 	{
-		// 나중에 EnemySpawner에 이런 함수 추가
-		// EnemySpawner->SetWaveData(CurrentWave);
+		EnemySpawner->SetWaveData(CurrentWave);
+		EnemySpawner->StartSpawning();
 	}
 }
