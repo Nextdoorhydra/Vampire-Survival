@@ -1,42 +1,31 @@
 #include "Enemy/EnemyBase.h"
+#include "Hitable/HitableComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
-#include "GameFramework/DamageType.h"
 
 AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	HitableComponent = CreateDefaultSubobject<UHitableComponent>(TEXT("HitableComponent"));
 }
 
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHP = MaxHP;
-	TargetActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	
-	// 밑에는 디버깅용 코드 지워도됨.
-	if (GEngine)
+	if (HitableComponent)
 	{
-		if (TargetActor)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TEXT("Player Found"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Player Not Found"));
-		}
+		HitableComponent->Initialize(MaxHP);
+		HitableComponent->OnDeathEvent.AddDynamic(this, &AEnemyBase::Death);
 	}
+
+	TargetActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 }
 
 void AEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bIsDead)
-	{
-		return;
-	}
 
 	if (TargetActor == nullptr)
 	{
@@ -47,79 +36,23 @@ void AEnemyBase::Tick(float DeltaTime)
 	Direction.Z = 0.f;
 	Direction = Direction.GetSafeNormal();
 
+	if (!Direction.IsNearlyZero())
+	{
+		const FRotator TargetRotation = Direction.Rotation();
+		SetActorRotation(FRotator(0.f, TargetRotation.Yaw, 0.f));
+	}
+
 	FVector NewLocation = GetActorLocation() + Direction * MoveSpeed * DeltaTime;
 	SetActorLocation(NewLocation);
 }
 
-float AEnemyBase::TakeDamage(
-	float DamageAmount,
-	FDamageEvent const& DamageEvent,
-	AController* EventInstigator,
-	AActor* DamageCauser
-)
+void AEnemyBase::TakeDamage(float Damage_, AActor* Attacker)
 {
-	if (bIsDead)
-	{
-		return 0.f;
-	}
-
-	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	if (ActualDamage <= 0.f)
-	{
-		return 0.f;
-	}
-
-	CurrentHP -= ActualDamage;
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Red,
-			FString::Printf(TEXT("Enemy Hit! CurrentHP: %.1f"), CurrentHP)
-		);
-	}
-
-	if (CurrentHP <= 0.f)
-	{
-		CurrentHP = 0.f;
-		Die();
-	}
-
-	return ActualDamage;
+	// 피격시 넉백 처리 여기에 추가
+	HitableComponent->AddHP(-Damage_);
 }
 
-void AEnemyBase::TestTakeDamage(float DamageAmount)
+void AEnemyBase::Death()
 {
-	UGameplayStatics::ApplyDamage(
-		this,
-		DamageAmount,
-		nullptr,
-		this,
-		UDamageType::StaticClass()
-	);
-}
-
-void AEnemyBase::Die()
-{
-	if (bIsDead)
-	{
-		return;
-	}
-
-	bIsDead = true;
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Yellow,
-			TEXT("Enemy Dead!")
-		);
-	}
-
 	Destroy();
 }
