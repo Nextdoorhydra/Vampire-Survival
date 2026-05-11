@@ -1,7 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Attack/AttackBaseComponent.h"
+#include "Component/Attack/AttackBaseComponent.h"
+
 #include "Hitable/IHitable.h"
 
 

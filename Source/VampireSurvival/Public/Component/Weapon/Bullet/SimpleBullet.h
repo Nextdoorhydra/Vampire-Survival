@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ABulletBase.h"
-#include "Attack/AttackBaseComponent.h"
+#include "Component/Attack/AttackBaseComponent.h"
 #include "Components/SphereComponent.h"
 
 #include "GameFramework/Actor.h"
