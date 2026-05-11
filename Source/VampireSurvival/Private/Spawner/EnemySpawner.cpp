@@ -6,7 +6,9 @@
 #include "NavigationSystem.h"
 #include "Character/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
-#include "GameFramework/Character.h"
+#include "DataAsset/EnemyDataAsset.h"
+#include "DataAsset/WaveDataAsset.h"
+#include "Enemy/EnemyBase.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -26,8 +28,55 @@ void AEnemySpawner::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player character not found"));
 	}
+}
+
+void AEnemySpawner::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 	
-	StartSpawning();
+	if (!bIsSpawning || !CurrentWaveData)
+	{
+		return;
+	}
+	
+	WaveElapsedTime += DeltaTime;
+	TimeSinceLastSpawn += DeltaTime;
+	
+	const FSpawnSegment* CurrentSegment = FindCurrentSpawnSegment();
+	
+	if (!CurrentSegment)
+	{
+		return;
+	}
+	
+	if (TimeSinceLastSpawn >= CurrentSegment->SpawnInterval)
+	{
+		TimeSinceLastSpawn = 0.f;
+		
+		if (const FEnemySpawnGroup* SpawnGroup = SelectEnemySpawnGroup(*CurrentSegment))
+		{
+			SpawnEnemyFromGroup(*SpawnGroup);
+		}
+	}
+	
+	if (!bBossSpawned && CurrentWaveData->BossEnemyDataAsset && WaveElapsedTime >= CurrentWaveData->BossSpawnTime)
+	{
+		bBossSpawned = true;
+		SpawnBoss();
+	}
+}
+
+void AEnemySpawner::SetWaveData(UWaveDataAsset* NewWaveData)
+{
+	CurrentWaveData = NewWaveData;
+	WaveElapsedTime = 0.f;
+	TimeSinceLastSpawn = 0.f;
+	bBossSpawned = false;
+	
+	if (CurrentWaveData)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: Wave data set. WaveIndex=%d"), CurrentWaveData->WaveIndex);
+	}
 }
 
 FVector AEnemySpawner::GetPlayerLocation() const
@@ -42,85 +91,136 @@ FVector AEnemySpawner::GetPlayerLocation() const
 
 void AEnemySpawner::StartSpawning()
 {
-	if (!GetWorld())
-	{
-		return;
-	}
-
-	GetWorld()->GetTimerManager().SetTimer(
-		SpawnTimerHandler,
-		this,
-		&AEnemySpawner::SpawnEnemy,
-		SpawnInterval,
-		true,
-		-1
-	);
+	bIsSpawning = true;
+	
+	TimeSinceLastSpawn = 0.f;
 }
 
 void AEnemySpawner::StopSpawning()
 {
-	if (!GetWorld())
-	{
-		return;
-	}
-
-	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandler);
+	bIsSpawning = false;
 }
 
-void AEnemySpawner::SpawnEnemy()
+const FSpawnSegment* AEnemySpawner::FindCurrentSpawnSegment() const
 {
-	if (!EnemyClass)
+	if (!CurrentWaveData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawner: Enemyclass not found"));
+		return nullptr;
+	}
+	
+	for (const FSpawnSegment& Segment : CurrentWaveData->SpawnSegments)
+	{
+		if (WaveElapsedTime >= Segment.StartTime && WaveElapsedTime < Segment.EndTime)
+		{
+			return &Segment;
+		}
+	}
+	
+	return nullptr;
+}
+
+const FEnemySpawnGroup* AEnemySpawner::SelectEnemySpawnGroup(const FSpawnSegment& Segment) const
+{
+	float totalWeight = 0.f;
+	
+	for (const FEnemySpawnGroup& Group : Segment.EnemyGroups)
+	{
+		if (Group.EnemyData && Group.SpawnWeight > 0.f)
+		{
+			totalWeight += Group.SpawnWeight;
+		}
+	}
+	
+	if (totalWeight <= 0.f)
+	{
+		return nullptr;
+	}
+	
+	float randValue = FMath::FRandRange(0.f, totalWeight);
+	
+	for (const FEnemySpawnGroup& Group : Segment.EnemyGroups)
+	{
+		if (!Group.EnemyData || Group.SpawnWeight <= 0.f)
+		{
+			continue;
+		}
+		
+		randValue -= Group.SpawnWeight;
+		if (randValue <= 0.f)
+		{
+			return &Group;
+		}
+	}
+	
+	return nullptr;
+}
+
+void AEnemySpawner::SpawnEnemyFromGroup(const FEnemySpawnGroup& SpawnGroup)
+{
+	SpawnEnemyFromData(
+		SpawnGroup.EnemyData,
+		SpawnGroup.HPScale,
+		SpawnGroup.CountPerSpawn
+		);
+}
+
+void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, float HPScale, int32 Count)
+{
+	if (!EnemyData || !EnemyData->EnemyClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: Invalid EnemyData"));
 		return;
 	}
+	
 	CleanupInvalidEnemies();
-
-	// 스폰 위치 선언
-	FVector SpawnLocation;
-
-	// spawn location 체크결과 false일 경우 return
-	if (!FindSpawnLocation(SpawnLocation))
+	
+	for (int32 i=0; i < Count; ++i)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawner: Failed to find spawn location"));
-		return;
-	}
-	
-	ACharacter* DefaultEnemy = EnemyClass->GetDefaultObject<ACharacter>();
-	if (!DefaultEnemy || !DefaultEnemy->GetCapsuleComponent())
-	{
-		return;
-	}
-	const float EnemyCapsuleHeight = DefaultEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	SpawnLocation.Z = EnemyCapsuleHeight;
-	
-	const FRotator SpawnRotation = FRotator::ZeroRotator;
-	
-	FActorSpawnParameters SpawnParams;
-	
-	SpawnParams.Owner = this;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	
-	ACharacter* SpawnedEnemy = GetWorld()->SpawnActor<ACharacter>(
-		EnemyClass,
-		SpawnLocation,
-		SpawnRotation,
-		SpawnParams
-	);
-	
-	if (SpawnedEnemy)
-	{
-		SpawnedEnemiesList.Add(SpawnedEnemy);
+		FVector SpawnLocation;
+		if (!FindSpawnLocation(SpawnLocation))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: FindSpawnLocation failed"));
+			continue;
+		}
+		
+		AEnemyBase* DefaultEnemy = EnemyData->EnemyClass->GetDefaultObject<AEnemyBase>();
+		if (DefaultEnemy && DefaultEnemy->GetCapsuleComponent())
+		{
+			SpawnLocation.Z = DefaultEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		}
+		
+		FActorSpawnParameters SpawnParams;
+		
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		
+		AEnemyBase* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBase>(
+			EnemyData->EnemyClass,
+			SpawnLocation,
+			FRotator::ZeroRotator,
+			SpawnParams
+		);
+		
+		if (SpawnedEnemy)
+		{
+			SpawnedEnemiesList.Add(SpawnedEnemy);
+		}
 	}
 }
+
+void AEnemySpawner::SpawnBoss()
+{
+	if (!CurrentWaveData || !CurrentWaveData->BossEnemyDataAsset)
+	{
+		return;
+	}
+	
+	SpawnEnemyFromData(CurrentWaveData->BossEnemyDataAsset, 1.f, 1);
+}
+
 
 bool AEnemySpawner::FindSpawnLocation(FVector& SpawnLocation) const
 {
-	// 플레이어 기준 랜덤 방향
-	// 최소 20m ~ 최대 30m
-	constexpr float minSpawnDistance = 2000.f;
-	constexpr float maxSpawnDistance = 3000.f;
-
 	const float angle = FMath::FRandRange(0.f, 2.f * PI);
 
 	FVector direction(
@@ -129,7 +229,7 @@ bool AEnemySpawner::FindSpawnLocation(FVector& SpawnLocation) const
 		0.f
 	);
 
-	const float distance = FMath::FRandRange(minSpawnDistance, maxSpawnDistance);
+	const float distance = FMath::FRandRange(MinSpawnDistance, MaxSpawnDistance);
 
 	const FVector candidateLocation = GetPlayerLocation() + direction * distance;
 
