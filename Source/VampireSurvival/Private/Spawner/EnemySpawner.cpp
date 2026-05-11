@@ -5,6 +5,7 @@
 
 #include "NavigationSystem.h"
 #include "Character/PlayerCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -25,6 +26,8 @@ void AEnemySpawner::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player character not found"));
 	}
+	
+	StartSpawning();
 }
 
 FVector AEnemySpawner::GetPlayerLocation() const
@@ -68,6 +71,7 @@ void AEnemySpawner::SpawnEnemy()
 {
 	if (!EnemyClass)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawner: Enemyclass not found"));
 		return;
 	}
 	CleanupInvalidEnemies();
@@ -78,6 +82,35 @@ void AEnemySpawner::SpawnEnemy()
 	// spawn location 체크결과 false일 경우 return
 	if (!FindSpawnLocation(SpawnLocation))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawner: Failed to find spawn location"));
+		return;
+	}
+	
+	ACharacter* DefaultEnemy = EnemyClass->GetDefaultObject<ACharacter>();
+	if (!DefaultEnemy || !DefaultEnemy->GetCapsuleComponent())
+	{
+		return;
+	}
+	const float EnemyCapsuleHeight = DefaultEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	SpawnLocation.Z = EnemyCapsuleHeight;
+	
+	const FRotator SpawnRotation = FRotator::ZeroRotator;
+	
+	FActorSpawnParameters SpawnParams;
+	
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	
+	ACharacter* SpawnedEnemy = GetWorld()->SpawnActor<ACharacter>(
+		EnemyClass,
+		SpawnLocation,
+		SpawnRotation,
+		SpawnParams
+	);
+	
+	if (SpawnedEnemy)
+	{
+		SpawnedEnemiesList.Add(SpawnedEnemy);
 	}
 }
 
@@ -125,7 +158,17 @@ bool AEnemySpawner::FindSpawnLocation(FVector& SpawnLocation) const
 	{
 		return false;
 	}
+	
+	UE_LOG(LogTemp, Warning, TEXT("Spawned"));
 
 	SpawnLocation = navLocation.Location;
 	return true;
+}
+
+void AEnemySpawner::CleanupInvalidEnemies()
+{
+	SpawnedEnemiesList.RemoveAll([](const TObjectPtr<AActor>& Enemy)
+	{
+		return !IsValid(Enemy);
+	});
 }

@@ -7,6 +7,7 @@
 #include "EnemySpawner.generated.h"
 
 class ACharacter;
+class APlayerCharacter;
 
 UCLASS()
 class VAMPIRESURVIVAL_API AEnemySpawner : public AActor
