@@ -1,7 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Weapon/Bullet/ABulletBase.h"
+#include "Component/Weapon/Bullet/ABulletBase.h"
+
 
 
 ABulletBase::ABulletBase()

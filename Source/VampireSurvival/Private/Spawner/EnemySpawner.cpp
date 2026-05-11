@@ -4,11 +4,11 @@
 #include "Spawner/EnemySpawner.h"
 
 #include "NavigationSystem.h"
-#include "Character/PlayerCharacter.h"
+#include "Entity/Character/PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "DataAsset/EnemyDataAsset.h"
 #include "DataAsset/WaveDataAsset.h"
-#include "Enemy/EnemyBase.h"
+#include "Entity/Enemy/EnemyBase.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values

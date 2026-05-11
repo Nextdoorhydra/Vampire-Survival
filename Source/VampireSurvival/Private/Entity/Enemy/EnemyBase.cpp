@@ -1,4 +1,4 @@
-#include "Enemy/EnemyBase.h"
+#include "Entity/Enemy/EnemyBase.h"
 #include "Hitable/HitableComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
