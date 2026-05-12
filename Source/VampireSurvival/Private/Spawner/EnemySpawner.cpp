@@ -107,7 +107,7 @@ const FSpawnSegment* AEnemySpawner::FindCurrentSpawnSegment() const
 	{
 		return nullptr;
 	}
-	
+
 	for (const FSpawnSegment& Segment : CurrentWaveData->SpawnSegments)
 	{
 		if (WaveElapsedTime >= Segment.StartTime && WaveElapsedTime < Segment.EndTime)
@@ -202,6 +202,7 @@ void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 C
 		
 		if (SpawnedEnemy)
 		{
+			SpawnedEnemy->InitializeFromData(EnemyData);
 			SpawnedEnemiesList.Add(SpawnedEnemy);
 		}
 	}
