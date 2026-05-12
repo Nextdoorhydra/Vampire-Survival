@@ -42,8 +42,8 @@ void UHitableComponent::AddHP(float Amount)
 
 void UHitableComponent::OnHPChanged()
 {
-	OnHPChangedEvent.Broadcast(CurrentHP, MaxHP);
 	if (CurrentHP > MaxHP) CurrentHP = MaxHP;
+	OnHPChangedEvent.Broadcast(CurrentHP, MaxHP);
 	if (CurrentHP <= 0.0f) OnDeathEvent.Broadcast();
 }
 

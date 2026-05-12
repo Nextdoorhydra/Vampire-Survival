@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PlayerData.h"
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExpChangedDelegate, float, CurrentExp, float, MaxExp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUpDelegate, int, Level);
 
 UCLASS()
 class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter
@@ -26,4 +30,22 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void AddExp(float InExp);
+	
+protected:
+
+	void LevelUp();
+
+	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
+	FOnExpChangedDelegate OnExpChangedDelegate; 
+	
+	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
+	FOnLevelUpDelegate OnLevelUpDelegate;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Stats")
+	FPlayerData PlayerData;
+
+	//임시데이터
+	int MaxExp = 100;
 };
