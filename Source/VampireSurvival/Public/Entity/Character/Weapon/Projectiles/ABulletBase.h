@@ -14,11 +14,14 @@ class VAMPIRESURVIVAL_API ABulletBase : public AActor
 public:
 	ABulletBase();
 
-	virtual void BulletSpawn(AActor* InOwner, FVector InDirection, float Damage){}
+	virtual void BulletSpawn(AActor* InOwner, float InDamage, float InKnockBack, float InLifeTime);
 	
 protected:
-	//life time
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
+	float LifeTime = 1.f;
+	float Damage = 0;
+	float KnockBack = 0;
 };

@@ -24,28 +24,34 @@ class VAMPIRESURVIVAL_API AWeaponBase : public AActor
 public:
 	AWeaponBase();
 
-	virtual void Fire(FVector Direction);
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
-	//On Kill 콜백 필요
+	//무기 kill count 올리려면?
 	
 protected:
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
-	float Delay = 1.0f;
-
-	//TODO 분리 필요
-	float FireDelay = 0.5f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|State")
 	EWeaponState CurrentState = EWeaponState::Idle;
 
 	FTimerHandle StateTimerHandle;
 
-	void OnDelay(float DeltaSeconds);
-	void OnIdle(float DeltaSeconds);
-	virtual void OnAttacking(float DeltaSeconds);
+	virtual void OnAttacking(){}
+	void FinishAttack();
 
+	//무기용 data asset 필요한듯?
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")
+	float FireDelay = 1.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")
+	float Damage = 1.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")
+	float KnockBack = 1.f;
+
+private:
 	void ChangeWeaponState(EWeaponState NewState);
-
+	void HandleDelayState();
+	void HandleIdleState();
+	void HandleAttackingState();
 };

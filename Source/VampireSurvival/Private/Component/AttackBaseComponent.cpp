@@ -18,4 +18,6 @@ void UAttackBaseComponent::HandleAttackOverlap(float Damage, IHitable* Hitable, 
 
 	UE_LOG(LogTemp, Warning, TEXT("In Component"));
 	// 피격 이펙트 등 추가 처리...
+
+	//bool값 반환시켜서, 죽였는지 확인하도록 수정필요
 }
