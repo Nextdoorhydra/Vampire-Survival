@@ -9,3 +9,11 @@ ABulletBase::ABulletBase()
 	RootComponent = DefaultSceneRoot;
 }
 
+void ABulletBase::BulletSpawn(AActor* InOwner, float InDamage, float InKnockBack, float InLifeTime)
+{
+	Damage = InDamage;
+	KnockBack = InKnockBack;
+	
+	SetLifeSpan(InLifeTime);
+}
+

@@ -38,22 +38,10 @@ void ASimpleBullet::BeginPlay()
 
 }
 
-void ASimpleBullet::BulletSpawn(AActor* InOwner, FVector InDirection, float Damage)
-{
-	Super::BulletSpawn(InOwner, InDirection, Damage);
-	
-}
-
-//TODO Owner 만들기
-
-
 void ASimpleBullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
-								   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
-								   bool bFromSweep, const FHitResult& SweepResult)
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
+                                    bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("bullet triggered"));
-
-	
 	if (OtherActor && OtherActor != GetInstigator() && OtherActor != this)
 	{
 		auto hitable = Cast<IHitable>(OtherActor);
@@ -62,9 +50,7 @@ void ASimpleBullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComponent, AA
 			AttackBaseComponent->HandleAttackOverlap(10, hitable, this);
 
 			UE_LOG(LogTemp, Warning, TEXT("Bullet Overlap"));
-			//TODO 관통처리?
-			//삭제처리
-			//Destroy();
+			Destroy();
 		}
 	}
 }

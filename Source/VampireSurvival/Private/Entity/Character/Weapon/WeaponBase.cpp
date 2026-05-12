@@ -11,50 +11,65 @@ AWeaponBase::AWeaponBase()
 	//TODO Attach to player
 }
 
-void AWeaponBase::Fire(FVector Direction)
-{
-	
-}
 
 void AWeaponBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	switch (CurrentState)
-	{
-	case EWeaponState::Idle: OnIdle(DeltaSeconds); break;
-	case EWeaponState::Attacking: OnAttacking(DeltaSeconds); break;
-	case EWeaponState::Delay: OnDelay(DeltaSeconds); break;
-	}
 }
 
-
-void AWeaponBase::OnIdle(float DeltaSeconds)
+void AWeaponBase::BeginPlay()
 {
-	//TODO : 임시로 비동기 처리를 핸들러로 구성함
-	GetWorldTimerManager()
-	.SetTimer(StateTimerHandle,
-		FTimerDelegate::CreateUObject(this,
-			&AWeaponBase::ChangeWeaponState, EWeaponState::Attacking), Delay, false);
+	Super::BeginPlay();
+	ChangeWeaponState(EWeaponState::Idle);
 }
-void AWeaponBase::OnAttacking(float DeltaSeconds)
+
+
+void AWeaponBase::HandleIdleState()
 {
 	GetWorldTimerManager()
 	.SetTimer(StateTimerHandle,
 		FTimerDelegate::CreateUObject(this,
-			&AWeaponBase::ChangeWeaponState, EWeaponState::Delay), FireDelay, false);
+			&AWeaponBase::ChangeWeaponState, EWeaponState::Attacking), FireDelay, false);
 }
 
-void AWeaponBase::OnDelay(float DeltaSeconds)
+void AWeaponBase::HandleAttackingState()
 {
-	//비동기 함수
+	OnAttacking();
+}
+
+void AWeaponBase::HandleDelayState()
+{
 	GetWorldTimerManager()
 	.SetTimer(StateTimerHandle,
 		FTimerDelegate::CreateUObject(this,
-			&AWeaponBase::ChangeWeaponState, EWeaponState::Attacking), Delay, false);
+			&AWeaponBase::ChangeWeaponState, EWeaponState::Attacking), FireDelay, false);
+}
+
+void AWeaponBase::FinishAttack()
+{
+	ChangeWeaponState(EWeaponState::Delay);
 }
 
 void AWeaponBase::ChangeWeaponState(const EWeaponState NewState)
 {
+	// 기존에 돌아가던 타이머가 있다면 중단 (중복 실행 방지)
+	GetWorldTimerManager().ClearTimer(StateTimerHandle);
+	
 	CurrentState = NewState;
+
+	switch (CurrentState)
+	{
+	case EWeaponState::Idle:
+		UE_LOG(LogTemp, Warning, TEXT("IDLE "));
+		HandleIdleState();
+		break;
+	case EWeaponState::Attacking:
+		UE_LOG(LogTemp, Warning, TEXT("ATTACKING "));
+		HandleAttackingState();
+		break;
+	case EWeaponState::Delay:
+		UE_LOG(LogTemp, Warning, TEXT("DELAY "));
+		HandleDelayState();
+		break;
+	}
 }

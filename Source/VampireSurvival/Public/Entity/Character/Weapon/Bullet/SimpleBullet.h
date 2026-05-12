@@ -20,8 +20,7 @@ class VAMPIRESURVIVAL_API ASimpleBullet : public ABulletBase
 public:
 	ASimpleBullet();
 	virtual void BeginPlay() override;
-
-	virtual void BulletSpawn(AActor* InOwner, FVector InDirection, float Damage) override;
+	
 	UFUNCTION(BlueprintCallable, Category = "Combat|Projectile")
 	void OnBulletOverlap(UPrimitiveComponent* OverlappedComponent,
 		AActor* OtherActor, UPrimitiveComponent* OtherComp,
