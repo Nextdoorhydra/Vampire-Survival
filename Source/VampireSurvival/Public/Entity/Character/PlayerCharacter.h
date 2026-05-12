@@ -3,12 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PlayerData.h"
+#include "Entity/Character/PlayerData.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h" 
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExpChangedDelegate, float, CurrentExp, float, MaxExp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUpDelegate, int, Level);
+
+class UInputMappingContext;
+class UInputAction;
+class UPlayerCameraComponent;
+class USpringArmComponent;
+class UCameraComponent; 
 
 UCLASS()
 class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter
@@ -23,7 +30,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -32,20 +39,43 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddExp(float InExp);
-	
+
 protected:
 
 	void LevelUp();
 
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
-	FOnExpChangedDelegate OnExpChangedDelegate; 
-	
+	FOnExpChangedDelegate OnExpChangedDelegate;
+
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnLevelUpDelegate OnLevelUpDelegate;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Stats")
 	FPlayerData PlayerData;
 
-	//임시데이터
+	//임시
 	int MaxExp = 100;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveAction;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	// UInputAction* LookAction;
+
+	void Move(const FInputActionValue& Value);
+	// void Look(const FInputActionValue& Value);
+	void LookAtMouse();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Aim")
+	FRotator AimRotation;
 };
