@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Entity/Character/Weapon/ThrowingDagger.h"
+#include "Entity/Character/Weapon/Instances/ThrowingDagger.h"
 #include "Curves/CurveVector.h"
 
 

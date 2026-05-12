@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Entity/Character/Weapon/WeaponBase.h"
+#include "Entity/Character/Weapon/Base/WeaponBase.h"
 // Sets default values
 AWeaponBase::AWeaponBase()
 {
