@@ -1,7 +1,7 @@
 #include "Item/ExpOrb.h"
+#include "Entity/Character/PlayerCharacter.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "GameFramework/Pawn.h"
 #include "Engine/Engine.h"
 
 AExpOrb::AExpOrb()
@@ -16,9 +16,7 @@ AExpOrb::AExpOrb()
 	OrbMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	SphereCollision->SetSphereRadius(200.0f);
-	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	SphereCollision->SetCollisionObjectType(ECC_WorldDynamic);
-	SphereCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+	SphereCollision->SetCollisionProfileName(TEXT("Item"));
 	SphereCollision->SetGenerateOverlapEvents(true);
 
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AExpOrb::OnOrbOverlap);
@@ -49,10 +47,9 @@ void AExpOrb::OnOrbOverlap(
 	{
 		return;
 	}
+	APlayerCharacter* playerCharacter = Cast<APlayerCharacter>(OtherActor);
 
-	APawn* PlayerPawn = Cast<APawn>(OtherActor);
-
-	if (PlayerPawn == nullptr)
+	if (playerCharacter == nullptr)
 	{
 		return;
 	}
