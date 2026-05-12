@@ -1,5 +1,6 @@
 #include "Entity/Enemy/EnemyBase.h"
 
+#include "DataAsset/EnemyDataAsset.h"
 #include "Component/HitableComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
@@ -56,4 +57,23 @@ void AEnemyBase::TakeDamage(float Damage_, AActor* Attacker)
 void AEnemyBase::Death()
 {
 	Destroy();
+}
+
+void AEnemyBase::InitializeFromData(const UEnemyDataAsset* EnemyData)
+{
+	if (!EnemyData)
+	{
+		return;
+	}
+
+	EnemyName = EnemyData->DisplayName;
+	MaxHP = EnemyData->BaseMaxHP;
+	MoveSpeed = EnemyData->BaseMoveSpeed;
+	ContactDamage = EnemyData->BaseDamage;
+
+	if (HitableComponent)
+	{
+		HitableComponent->Initialize(MaxHP);
+	}
+	
 }

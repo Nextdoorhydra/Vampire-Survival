@@ -6,6 +6,7 @@
 
 #include "EnemyBase.generated.h"
 
+class UEnemyDataAsset;
 class UHitableComponent;
 
 UCLASS()
@@ -23,11 +24,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void TakeDamage(float Damage_, AActor* Attacker) override;
+
+	UFUNCTION()
 	virtual void Death() override;
+
+	void InitializeFromData(const UEnemyDataAsset* EnemyData);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
 	TObjectPtr<UHitableComponent> HitableComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Data")
+	FText EnemyName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Stats")
 	float MaxHP = 100.f;
