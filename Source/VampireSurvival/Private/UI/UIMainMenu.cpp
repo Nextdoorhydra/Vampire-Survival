@@ -25,7 +25,7 @@ void UUIMainMenu::NativeConstruct()
 	// NativeOnInitialized ->  AddToViewport -> NativeConstruct
 	if (Btn_StartGame)
 	{
-		bIsFocusable = true;
+		SetIsFocusable(true);
 	}
 	
 	// // 최후의 수단 InputMode 쓰기

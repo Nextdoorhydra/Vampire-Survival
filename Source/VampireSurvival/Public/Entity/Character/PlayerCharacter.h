@@ -6,6 +6,7 @@
 #include "Entity/Character/PlayerData.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h" 
+#include "Entity/IHitable.h"
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExpChangedDelegate, float, CurrentExp, float, MaxExp);
@@ -15,43 +16,56 @@ class UInputMappingContext;
 class UInputAction;
 class UPlayerCameraComponent;
 class UCameraComponent; 
+class UHitableComponent;
+class UInventoryComponent;
 
 UCLASS()
-class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter
+class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter, public IHitable
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	virtual void TakeDamage(float Damage_, AActor* Attacker) override;
+
+	UFUNCTION()
+	virtual void Death() override;
+	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
 	void AddExp(float InExp);
-
-protected:
-
-	void LevelUp();
-
+	
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnExpChangedDelegate OnExpChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnLevelUpDelegate OnLevelUpDelegate;
+	
+	TObjectPtr<UHitableComponent> GetHitableComponent();
+	TObjectPtr<UInventoryComponent> GetInventoryComponent();
+	
+protected:
+
+	void LevelUp();
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Stats")
 	FPlayerData PlayerData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Component")
+	TObjectPtr<UHitableComponent> HitableComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Component")
+	TObjectPtr<UInventoryComponent> InventoryComponent;
+	
 	//임시
 	int MaxExp = 100;
 
@@ -61,12 +75,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	// UInputAction* LookAction;
-
+	
 	void Move(const FInputActionValue& Value);
-	// void Look(const FInputActionValue& Value);
 	void LookAtMouse();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
