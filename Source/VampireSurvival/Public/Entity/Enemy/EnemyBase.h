@@ -8,6 +8,9 @@
 
 class UEnemyDataAsset;
 class UHitableComponent;
+class UAttackBaseComponent;
+class UPrimitiveComponent;
+class USphereComponent;
 
 UCLASS()
 class VAMPIRESURVIVAL_API AEnemyBase : public ACharacter, public IHitable
@@ -31,9 +34,25 @@ public:
 	void InitializeFromData(const UEnemyDataAsset* EnemyData);
 
 protected:
+	UFUNCTION()
+	void OnAttackBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnAttackEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void ApplyContactDamage(float DeltaTime);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
 	TObjectPtr<UHitableComponent> HitableComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
+	TObjectPtr<UAttackBaseComponent> AttackComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
+	TObjectPtr<USphereComponent> SphereComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Data")
 	FText EnemyName;
 
@@ -48,5 +67,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Target")
 	AActor* TargetActor = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> ContactDamageTargets;
 	
 };
