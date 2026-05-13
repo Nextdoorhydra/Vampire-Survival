@@ -25,12 +25,6 @@ protected:
 	
 	virtual void ApplyLevelSpec(int InLevel) override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	float OrbitFloatingSpeed = 10.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
-	int32 RotationCount  = 3;
-	
 	UPROPERTY(VisibleAnywhere)
 	class UTimelineComponent* OrbitTimeline;
 
@@ -39,6 +33,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Weapon|Timeline")
 	class UCurveFloat* OrbitScaleCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	int32 RotationCount  = 3;
 	
 private:
 	

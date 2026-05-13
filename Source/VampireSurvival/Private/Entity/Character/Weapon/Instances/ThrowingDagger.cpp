@@ -3,6 +3,7 @@
 
 #include "Entity/Character/Weapon/Instances/ThrowingDagger.h"
 #include "Curves/CurveVector.h"
+#include "Item/EquipData.h"
 
 
 AThrowingDagger::AThrowingDagger()
@@ -51,11 +52,15 @@ void AThrowingDagger::OnAttacking()
 
 void AThrowingDagger::ApplyLevelSpec(int InLevel)
 {
-	//TODO 데이터 에셋 받아서 증가량 적용
-	if (InLevel >= 2) Damage = 3;
-	if (InLevel >= 3) DaggerCount = 2;
-	if (InLevel >= 4) FireDelay = 0.5f;
-	if (InLevel >= 5) DaggerCount = 4;
+	if (InLevel < 1 || EquipData->LevelDataList.Num() >= InLevel) return;
+	auto levelPower = EquipData->LevelDataList[InLevel].AttackPowerIncrease; 
+	switch (InLevel)
+	{
+	case 2: Damage += levelPower; break; 
+	case 3: DaggerCount += levelPower; break; 
+	case 4: FireDelay *= (1.0f - (levelPower / 100.f)); break;
+	case 5: Damage += levelPower; break;
+	}
 }
 
 void AThrowingDagger::LookAt()

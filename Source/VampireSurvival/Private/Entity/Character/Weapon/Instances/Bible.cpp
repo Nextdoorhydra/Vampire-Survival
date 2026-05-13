@@ -4,8 +4,7 @@
 #include "Entity/Character/Weapon/Instances/Bible.h"
 
 #include "Components/TimelineComponent.h"
-#include "Entity/Character/Weapon/OrbitObject/OrbitObject.h"
-#include "Entity/Character/Weapon/OrbitObject/SimpleOrbitObject.h"
+#include "Item/EquipData.h"
 
 
 // Sets default values
@@ -52,10 +51,15 @@ void ABible::FinishAttack()
 
 void ABible::ApplyLevelSpec(int InLevel)
 {
-	if (InLevel >= 2) Damage = 3;
-	if (InLevel >= 3) OrbitObjectCount = 2;
-	if (InLevel >= 4) FireDelay = 0.5f;
-	if (InLevel >= 5) OrbitObjectCount = 4;
+	if (InLevel < 1 || EquipData->LevelDataList.Num() >= InLevel) return;
+	auto levelPower = EquipData->LevelDataList[InLevel].AttackPowerIncrease; 
+	switch (InLevel)
+	{
+	case 2: Damage += levelPower; break; 
+	case 3: OrbitObjectCount += levelPower; break; 
+	case 4: FireDelay *= (1.0f - (levelPower / 100.f)); break;
+	case 5: Damage += levelPower; break;
+	}
 }
 
 void ABible::UpdateOrbitScale(float timelineElapse)
