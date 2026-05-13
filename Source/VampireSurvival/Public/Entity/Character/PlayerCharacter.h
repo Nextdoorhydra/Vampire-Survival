@@ -14,7 +14,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUpDelegate, int, Level);
 class UInputMappingContext;
 class UInputAction;
 class UPlayerCameraComponent;
-class USpringArmComponent;
 class UCameraComponent; 
 
 UCLASS()
@@ -69,9 +68,6 @@ protected:
 	void Move(const FInputActionValue& Value);
 	// void Look(const FInputActionValue& Value);
 	void LookAtMouse();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* FollowCamera;
