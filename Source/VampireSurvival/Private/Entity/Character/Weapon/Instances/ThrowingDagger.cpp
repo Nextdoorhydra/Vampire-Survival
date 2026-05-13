@@ -18,6 +18,8 @@ void AThrowingDagger::OnAttacking()
 		return;
 	}
 
+	LookAt();
+
 	const FRichCurve& RichCurve = SpawnTimingCurve->FloatCurve;
     
 	const int32 TotalKeys = RichCurve.Keys.Num();
@@ -45,6 +47,14 @@ void AThrowingDagger::OnAttacking()
 			
 		}, SpawnDelay, false);
 	}
+}
+
+void AThrowingDagger::LookAt()
+{
+	Super::LookAt();
+	if (!GetOwner()) return;
+	
+	SetActorRotation(GetOwner()->GetActorRotation());
 }
 
 FTransform AThrowingDagger::GetRandomSpawnTransform() const

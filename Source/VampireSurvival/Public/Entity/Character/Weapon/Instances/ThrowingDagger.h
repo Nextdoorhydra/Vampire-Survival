@@ -17,7 +17,9 @@ public:
 	AThrowingDagger();
 
 protected:
+	
 	virtual void OnAttacking() override;
+	virtual void LookAt() override;
 
 	UPROPERTY(EditAnywhere, Category = "Weapon|Spawn")
 	TObjectPtr<UCurveVector> SpawnLocationCurve;
