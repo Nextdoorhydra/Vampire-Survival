@@ -34,12 +34,14 @@ void AThrowingDagger::OnAttacking()
 		bool bIsLastKey = (i >= SpawnCount -1);
 
 		FTimerHandle TempHandle;
-		GetWorldTimerManager().SetTimer(TempHandle, [this, bIsLastKey]()
+		TWeakObjectPtr WeakThis(this);
+		GetWorldTimerManager().SetTimer(TempHandle, [WeakThis, bIsLastKey]()
 		{
-			if (!IsValid(this)) return;
-			RequestBulletSpawn(GetRandomSpawnTransform());
+			
+			if (!WeakThis.IsValid()) return;
+			WeakThis->RequestBulletSpawn(WeakThis->GetRandomSpawnTransform());
 			if (bIsLastKey)
-				this->FinishAttack();
+				WeakThis->FinishAttack();
 			
 		}, SpawnDelay, false);
 	}
