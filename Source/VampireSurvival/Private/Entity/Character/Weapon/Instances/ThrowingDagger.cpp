@@ -49,6 +49,19 @@ void AThrowingDagger::OnAttacking()
 	}
 }
 
+void AThrowingDagger::ApplyLevelSpec(int InLevel)
+{
+	//TODO 데이터 에셋 받아서 증가량 적용
+	switch (InLevel)
+	{
+	case 2: Damage = 3; break;
+	case 3: DaggerCount = 2; break;
+	case 4: FireDelay = 0.5f; break;
+	case 5: DaggerCount = 4; break;
+	default: break;
+	}
+}
+
 void AThrowingDagger::LookAt()
 {
 	Super::LookAt();

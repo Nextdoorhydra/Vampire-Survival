@@ -42,6 +42,7 @@ protected:
 
 	virtual void OnAttacking(){}
 	void FinishAttack();
+	virtual void ApplyLevelSpec(int InLevel);
 
 	//무기용 data asset 필요한듯?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")

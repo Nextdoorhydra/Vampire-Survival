@@ -64,6 +64,10 @@ void AWeaponBase::FinishAttack()
 	ChangeWeaponState(EWeaponState::Delay);
 }
 
+void AWeaponBase::ApplyLevelSpec(int InLevel)
+{
+}
+
 void AWeaponBase::ChangeWeaponState(const EWeaponState NewState)
 {
 	// 기존에 돌아가던 타이머가 있다면 중단 (중복 실행 방지)
@@ -74,15 +78,12 @@ void AWeaponBase::ChangeWeaponState(const EWeaponState NewState)
 	switch (CurrentState)
 	{
 	case EWeaponState::Idle:
-		UE_LOG(LogTemp, Warning, TEXT("IDLE "));
 		HandleIdleState();
 		break;
 	case EWeaponState::Attacking:
-		UE_LOG(LogTemp, Warning, TEXT("ATTACKING "));
 		HandleAttackingState();
 		break;
 	case EWeaponState::Delay:
-		UE_LOG(LogTemp, Warning, TEXT("DELAY "));
 		HandleDelayState();
 		break;
 	}
