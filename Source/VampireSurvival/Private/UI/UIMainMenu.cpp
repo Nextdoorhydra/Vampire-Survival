@@ -24,7 +24,9 @@ void UUIMainMenu::NativeConstruct()
 	// 초기에 UI에 포커스 고정
 	// NativeOnInitialized ->  AddToViewport -> NativeConstruct
 	if (Btn_StartGame)
-		SetFocus();
+	{
+		bIsFocusable = true;
+	}
 	
 	// // 최후의 수단 InputMode 쓰기
 	// APlayerController* PC = GetOwningPlayer();
