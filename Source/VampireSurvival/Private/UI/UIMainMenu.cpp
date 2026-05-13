@@ -1,4 +1,5 @@
 ﻿#include "UI/UIMainMenu.h"
+#include "CommonInputModeTypes.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h" 
@@ -14,6 +15,42 @@ void UUIMainMenu::NativeOnInitialized()
 	if (Btn_StartGame) Btn_StartGame->OnClicked.AddDynamic(this, &UUIMainMenu::OnStartGameClicked);
 	if (Btn_Option) Btn_Option->OnClicked.AddDynamic(this, &UUIMainMenu::OnOptionClicked);
 	if (Btn_Quit) Btn_Quit->OnClicked.AddDynamic(this, &UUIMainMenu::OnQuitClicked);
+}
+
+void UUIMainMenu::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	// 초기에 UI에 포커스 고정
+	// NativeOnInitialized ->  AddToViewport -> NativeConstruct
+	if (Btn_StartGame)
+		SetFocus();
+	
+	// // 최후의 수단 InputMode 쓰기
+	// APlayerController* PC = GetOwningPlayer();
+	// if (PC)
+	// {
+	// 	FInputModeUIOnly InputMode;
+	// 	InputMode.SetWidgetToFocus(TakeWidget());
+	// 	PC->SetInputMode(InputMode);
+	// 	PC->bShowMouseCursor = true;
+	// }
+}
+
+UWidget* UUIMainMenu::NativeGetDesiredFocusTarget() const
+{	
+	if (Btn_StartGame)
+		return Btn_StartGame;
+	else
+	{
+		return Super::NativeGetDesiredFocusTarget();
+	}
+}
+
+TOptional<FUIInputConfig> UUIMainMenu::GetDesiredInputConfig() const
+{
+	// ECommonInputMode::Menu -> 게임 조작(뷰포트)을 무시
+	return FUIInputConfig(ECommonInputMode::Menu, EMouseCaptureMode::NoCapture);
 }
 
 void UUIMainMenu::OnStartGameClicked()
