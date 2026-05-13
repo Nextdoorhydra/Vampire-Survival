@@ -41,7 +41,10 @@ protected:
 	FTimerHandle StateTimerHandle;
 
 	virtual void OnAttacking(){}
-	void FinishAttack();
+
+	UFUNCTION()
+	virtual void FinishAttack();
+	
 	virtual void ApplyLevelSpec(int InLevel);
 
 	//무기용 data asset 필요한듯?
