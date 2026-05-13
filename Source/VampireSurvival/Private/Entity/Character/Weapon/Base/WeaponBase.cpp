@@ -28,9 +28,9 @@ void AWeaponBase::BeginPlay()
 void AWeaponBase::Spawn(AActor* InOwner)
 {
 	FAttachmentTransformRules AttachRules(
-		EAttachmentRule::KeepRelative, // Location: 부모를 따라다님 (상대 거리 유지)
-		EAttachmentRule::KeepWorld,    // Rotation: 부모가 회전해도 무기는 회전하지 않음
-		EAttachmentRule::KeepWorld,    // Scale: 부모 크기가 커져도 무기는 그대로
+		EAttachmentRule::KeepRelative, 
+		EAttachmentRule::KeepWorld,    
+		EAttachmentRule::KeepWorld,    
 		false                          
 	);
 	
