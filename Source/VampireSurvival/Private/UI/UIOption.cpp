@@ -1,5 +1,6 @@
 ﻿#include "UI/UIOption.h"
 #include "Components/Button.h"
+#include "CommonInputModeTypes.h"
 
 void UUIOption::NativeOnInitialized()
 {
@@ -13,4 +14,11 @@ void UUIOption::NativeOnInitialized()
 void UUIOption::OnCloseClicked()
 {
 	CloseUI();
+}
+
+
+TOptional<FUIInputConfig> UUIOption::GetDesiredInputConfig() const
+{
+	// ECommonInputMode::Menu -> 게임 조작(뷰포트)을 무시
+	return FUIInputConfig(ECommonInputMode::Menu, EMouseCaptureMode::NoCapture);
 }
