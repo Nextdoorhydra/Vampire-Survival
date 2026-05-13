@@ -97,6 +97,16 @@ void APlayerCharacter::AddExp(float InExp)
 	OnExpChangedDelegate.Broadcast(PlayerData.Exp, MaxExp);
 }
 
+TObjectPtr<UHitableComponent> APlayerCharacter::GetHitableComponent()
+{
+	return HitableComponent;
+}
+
+TObjectPtr<UInventoryComponent> APlayerCharacter::GetInventoryComponent()
+{
+	return InventoryComponent;
+}
+
 void APlayerCharacter::LevelUp()
 {
 	PlayerData.Level += 1;

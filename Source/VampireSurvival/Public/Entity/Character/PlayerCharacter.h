@@ -42,16 +42,20 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddExp(float InExp);
-
-protected:
-
-	void LevelUp();
-
+	
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnExpChangedDelegate OnExpChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnLevelUpDelegate OnLevelUpDelegate;
+	
+	TObjectPtr<UHitableComponent> GetHitableComponent();
+	TObjectPtr<UInventoryComponent> GetInventoryComponent();
+	
+protected:
+
+	void LevelUp();
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Stats")
 	FPlayerData PlayerData;
