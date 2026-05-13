@@ -1,8 +1,8 @@
-﻿#include "Gamemode/VampireSurvivalGamemode.h"
-#include "UI/Presenter/UIPPlayer.h"
+﻿#include "UI/Presenter/UIPPlayer.h"
+#include "UI/UIPlayer.h"
+#include "Gamemode/VampireSurvivalGamemode.h"
 #include "Entity/Character/PlayerCharacter.h"
 #include "Component/HitableComponent.h"
-#include "UI/UIPlayer.h"
 
 void UUIPPlayer::Bind(APlayerCharacter* InPlayer, UUIPlayer* InUI)
 {
