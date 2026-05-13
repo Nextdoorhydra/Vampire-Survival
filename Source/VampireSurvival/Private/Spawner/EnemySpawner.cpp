@@ -39,6 +39,12 @@ void AEnemySpawner::Tick(float DeltaTime)
 		return;
 	}
 	
+	if (!bBossSpawned && CurrentWaveData->BossEnemyDataAsset && WaveElapsedTime >= CurrentWaveData->BossSpawnTime)
+	{
+		bBossSpawned = true;
+		SpawnBoss();
+	}
+	
 	WaveElapsedTime += DeltaTime;
 	TimeSinceLastSpawn += DeltaTime;
 	
@@ -57,12 +63,6 @@ void AEnemySpawner::Tick(float DeltaTime)
 		{
 			SpawnEnemyFromGroup(*SpawnGroup);
 		}
-	}
-	
-	if (!bBossSpawned && CurrentWaveData->BossEnemyDataAsset && WaveElapsedTime >= CurrentWaveData->BossSpawnTime)
-	{
-		bBossSpawned = true;
-		SpawnBoss();
 	}
 }
 
