@@ -52,14 +52,10 @@ void AThrowingDagger::OnAttacking()
 void AThrowingDagger::ApplyLevelSpec(int InLevel)
 {
 	//TODO 데이터 에셋 받아서 증가량 적용
-	switch (InLevel)
-	{
-	case 2: Damage = 3; break;
-	case 3: DaggerCount = 2; break;
-	case 4: FireDelay = 0.5f; break;
-	case 5: DaggerCount = 4; break;
-	default: break;
-	}
+	if (InLevel >= 2) Damage = 3;
+	if (InLevel >= 3) DaggerCount = 2;
+	if (InLevel >= 4) FireDelay = 0.5f;
+	if (InLevel >= 5) DaggerCount = 4;
 }
 
 void AThrowingDagger::LookAt()
@@ -68,6 +64,7 @@ void AThrowingDagger::LookAt()
 	if (!GetOwner()) return;
 	
 	SetActorRotation(GetOwner()->GetActorRotation());
+
 }
 
 FTransform AThrowingDagger::GetRandomSpawnTransform() const

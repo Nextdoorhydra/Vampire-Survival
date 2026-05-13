@@ -2,10 +2,10 @@
 
 
 
-// #include "Weapon/Projectiles/SimpleBullet.h"
+// #include "Weapon/ProjectileObject/SimpleBullet.h"
 //
 // #include "Attack/SimpleAttackComponent.h"
-#include "Entity/Character/Weapon/Projectiles/SimpleBullet.h"
+#include "Entity/Character/Weapon/ProjectileObject/SimpleBullet.h"
 
 
 #include "Component/SimpleAttackComponent.h"
