@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Component/HitableComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Item/InventoryComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -26,6 +27,7 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetWorldRotation(FRotator(-60.f, 0.f, 0.f));
 
 	HitableComponent = CreateDefaultSubobject<UHitableComponent>(TEXT("HitableComponent"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 void APlayerCharacter::TakeDamage(float Damage_, AActor* Attacker)

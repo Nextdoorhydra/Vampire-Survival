@@ -17,6 +17,7 @@ class UInputAction;
 class UPlayerCameraComponent;
 class UCameraComponent; 
 class UHitableComponent;
+class UInventoryComponent;
 
 UCLASS()
 class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter, public IHitable
@@ -57,6 +58,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Component")
 	TObjectPtr<UHitableComponent> HitableComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Component")
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 	
 	//임시
 	int MaxExp = 100;
@@ -67,12 +71,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveAction;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	// UInputAction* LookAction;
-
+	
 	void Move(const FInputActionValue& Value);
-	// void Look(const FInputActionValue& Value);
 	void LookAtMouse();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
