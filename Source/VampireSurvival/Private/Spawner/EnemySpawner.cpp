@@ -33,32 +33,32 @@ void AEnemySpawner::BeginPlay()
 void AEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (!bIsSpawning || !CurrentWaveData)
 	{
 		return;
 	}
-	
-	if (!bBossSpawned && CurrentWaveData->BossEnemyDataAsset && WaveElapsedTime >= CurrentWaveData->BossSpawnTime)
+
+	if (!bBossSpawned && CurrentWaveData->BossEnemyDataAsset && RunElapsedTime >= CurrentWaveData->BossSpawnTime)
 	{
 		bBossSpawned = true;
 		SpawnBoss();
 	}
-	
-	WaveElapsedTime += DeltaTime;
+
+	RunElapsedTime += DeltaTime;
 	TimeSinceLastSpawn += DeltaTime;
-	
+
 	const FSpawnSegment* CurrentSegment = FindCurrentSpawnSegment();
-	
+
 	if (!CurrentSegment)
 	{
 		return;
 	}
-	
+
 	if (TimeSinceLastSpawn >= CurrentSegment->SpawnInterval)
 	{
 		TimeSinceLastSpawn = 0.f;
-		
+
 		if (const FEnemySpawnGroup* SpawnGroup = SelectEnemySpawnGroup(*CurrentSegment))
 		{
 			SpawnEnemyFromGroup(*SpawnGroup);
@@ -69,10 +69,9 @@ void AEnemySpawner::Tick(float DeltaTime)
 void AEnemySpawner::SetWaveData(UWaveDataAsset* NewWaveData)
 {
 	CurrentWaveData = NewWaveData;
-	WaveElapsedTime = 0.f;
 	TimeSinceLastSpawn = 0.f;
 	bBossSpawned = false;
-	
+
 	if (CurrentWaveData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: Wave data set. WaveIndex=%d"), CurrentWaveData->WaveIndex);
@@ -92,7 +91,7 @@ FVector AEnemySpawner::GetPlayerLocation() const
 void AEnemySpawner::StartSpawning()
 {
 	bIsSpawning = true;
-	
+
 	TimeSinceLastSpawn = 0.f;
 }
 
@@ -110,19 +109,24 @@ const FSpawnSegment* AEnemySpawner::FindCurrentSpawnSegment() const
 
 	for (const FSpawnSegment& Segment : CurrentWaveData->SpawnSegments)
 	{
-		if (WaveElapsedTime >= Segment.StartTime && WaveElapsedTime < Segment.EndTime)
+		if (RunElapsedTime >= Segment.StartTime && RunElapsedTime < Segment.EndTime)
 		{
 			return &Segment;
 		}
 	}
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("Wave=%d WaveElapsed=%.2f Segments=%d"),
+	       CurrentWaveData->WaveIndex,
+	       RunElapsedTime,
+	       CurrentWaveData->SpawnSegments.Num());
+
 	return nullptr;
 }
 
 const FEnemySpawnGroup* AEnemySpawner::SelectEnemySpawnGroup(const FSpawnSegment& Segment) const
 {
 	float totalWeight = 0.f;
-	
+
 	for (const FEnemySpawnGroup& Group : Segment.EnemyGroups)
 	{
 		if (Group.EnemyData && Group.SpawnWeight > 0.f)
@@ -130,28 +134,28 @@ const FEnemySpawnGroup* AEnemySpawner::SelectEnemySpawnGroup(const FSpawnSegment
 			totalWeight += Group.SpawnWeight;
 		}
 	}
-	
+
 	if (totalWeight <= 0.f)
 	{
 		return nullptr;
 	}
-	
+
 	float randValue = FMath::FRandRange(0.f, totalWeight);
-	
+
 	for (const FEnemySpawnGroup& Group : Segment.EnemyGroups)
 	{
 		if (!Group.EnemyData || Group.SpawnWeight <= 0.f)
 		{
 			continue;
 		}
-		
+
 		randValue -= Group.SpawnWeight;
 		if (randValue <= 0.f)
 		{
 			return &Group;
 		}
 	}
-	
+
 	return nullptr;
 }
 
@@ -160,7 +164,7 @@ void AEnemySpawner::SpawnEnemyFromGroup(const FEnemySpawnGroup& SpawnGroup)
 	SpawnEnemyFromData(
 		SpawnGroup.EnemyData,
 		SpawnGroup.CountPerSpawn
-		);
+	);
 }
 
 void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 Count)
@@ -170,10 +174,10 @@ void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 C
 		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: Invalid EnemyData"));
 		return;
 	}
-	
+
 	CleanupInvalidEnemies();
-	
-	for (int32 i=0; i < Count; ++i)
+
+	for (int32 i = 0; i < Count; ++i)
 	{
 		FVector SpawnLocation;
 		if (!FindSpawnLocation(SpawnLocation))
@@ -181,25 +185,26 @@ void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 C
 			UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: FindSpawnLocation failed"));
 			continue;
 		}
-		
+
 		AEnemyBase* DefaultEnemy = EnemyData->EnemyClass->GetDefaultObject<AEnemyBase>();
 		if (DefaultEnemy && DefaultEnemy->GetCapsuleComponent())
 		{
 			SpawnLocation.Z = DefaultEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 		}
-		
+
 		FActorSpawnParameters SpawnParams;
-		
+
 		SpawnParams.Owner = this;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-		
+		SpawnParams.SpawnCollisionHandlingOverride =
+			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
 		AEnemyBase* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBase>(
 			EnemyData->EnemyClass,
 			SpawnLocation,
 			FRotator::ZeroRotator,
 			SpawnParams
 		);
-		
+
 		if (SpawnedEnemy)
 		{
 			SpawnedEnemy->InitializeFromData(EnemyData);
@@ -214,7 +219,7 @@ void AEnemySpawner::SpawnBoss()
 	{
 		return;
 	}
-	
+
 	SpawnEnemyFromData(CurrentWaveData->BossEnemyDataAsset, 1);
 }
 
@@ -258,7 +263,7 @@ bool AEnemySpawner::FindSpawnLocation(FVector& SpawnLocation) const
 	{
 		return false;
 	}
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("Spawned"));
 
 	SpawnLocation = navLocation.Location;
@@ -271,4 +276,9 @@ void AEnemySpawner::CleanupInvalidEnemies()
 	{
 		return !IsValid(Enemy);
 	});
+}
+
+void AEnemySpawner::SetElapsedTime(float InElapsedTime)
+{
+	RunElapsedTime = InElapsedTime;
 }

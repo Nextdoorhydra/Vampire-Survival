@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "DataAsset/RunConfigDataAsset.h"
 #include "DataAsset/WaveDataAsset.h"
+#include "Kismet/GameplayStatics.h"
 #include "Spawner/EnemySpawner.h"
 
 AVampireSurvivalGamemode::AVampireSurvivalGamemode()
@@ -12,6 +13,7 @@ AVampireSurvivalGamemode::AVampireSurvivalGamemode()
 void AVampireSurvivalGamemode::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 	for (TActorIterator<AEnemySpawner> It(GetWorld()); It; ++It)
 	{
@@ -32,8 +34,8 @@ void AVampireSurvivalGamemode::StartRun()
 
 	//Debug, Production duration set 및 판단
 	RunDurationSeconds = bUseDebugDuration
-		? RunConfig->DebugDurationSeconds
-		: RunConfig->ProductionDurationSeconds;
+		                     ? RunConfig->DebugDurationSeconds
+		                     : RunConfig->ProductionDurationSeconds;
 
 	ElapsedTime = 0.f;
 	CurrentWave = nullptr;
@@ -121,6 +123,7 @@ void AVampireSurvivalGamemode::SetCurrentWave(UWaveDataAsset* NewWave)
 
 	if (EnemySpawner)
 	{
+		EnemySpawner->SetElapsedTime(ElapsedTime);
 		EnemySpawner->SetWaveData(CurrentWave);
 		EnemySpawner->StartSpawning();
 	}
