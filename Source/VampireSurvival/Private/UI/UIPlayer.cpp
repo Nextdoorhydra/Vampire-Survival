@@ -2,6 +2,12 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
+TOptional<FUIInputConfig> UUIPlayer::GetDesiredInputConfig() const
+{
+	// ECommonInputMode::Game으로 설정하여 캐릭터 조작을 허용합니다.
+	return FUIInputConfig(ECommonInputMode::Game, EMouseCaptureMode::CaptureDuringMouseDown);
+}
+
 void UUIPlayer::OnHealthChanged(float CurrentHealth, float MaxHealth)
 {
 	if (PB_Health && MaxHealth > 0.f)

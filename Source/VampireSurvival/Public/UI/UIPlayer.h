@@ -32,6 +32,8 @@ public:
 	void OnTimerChanged(float NewTime);
 
 protected:
+	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
+	
 	// UMG 에디터에서 동일한 이름으로 위젯을 생성해야 바인딩됩니다.
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UProgressBar* PB_Health;
