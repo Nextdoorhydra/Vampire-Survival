@@ -9,10 +9,17 @@ UCLASS()
 class VAMPIRESURVIVAL_API UUIMainMenu : public UUIBase
 {
 	GENERATED_BODY()
+	
+public:
+	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 
 protected:
 	virtual void NativeOnInitialized() override;
-
+	
+	virtual void NativeConstruct() override;
+	
+	virtual UWidget* NativeGetDesiredFocusTarget() const override;
+	
 	UPROPERTY(BlueprintReadOnly, meta = (BindWidget))
 	UButton* Btn_StartGame;
 
