@@ -21,6 +21,9 @@ class VAMPIRESURVIVAL_API AVampireSurvivalGamemode : public AGameModeBase
 
 public:
 	AVampireSurvivalGamemode();
+	
+	UPROPERTY(BlueprintAssignable, Category = "InGamemode|Run")
+	FOnRunElapsedTimeChanged OnRunElapsedTimeChanged;
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,11 +34,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "InGamemode|Run")
 	bool bUseDebugDuration = true;
 
-	UPROPERTY(BlueprintReadOnly, Category = "InGamemode|Run")
-	float ElapsedTime = 0.f;
 
-	UPROPERTY(BlueprintAssignable, Category = "InGamemode|Run")
-	FOnRunElapsedTimeChanged OnRunElapsedTimeChanged;
 
 	UPROPERTY(BlueprintReadOnly, Category = "InGamemode|Run")
 	float RunDurationSeconds = 300.f;
@@ -57,4 +56,8 @@ protected:
 
 	UWaveDataAsset* FindWaveForElapsedTime(float InElapsedTime) const;
 	void SetCurrentWave(UWaveDataAsset* NewWave);
+	
+private:
+	UPROPERTY(BlueprintReadOnly, Category = "InGamemode|Run", meta=(AllowPrivateAccess = true))
+	float ElapsedTime = 0.f;
 };
