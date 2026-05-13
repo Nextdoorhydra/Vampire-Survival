@@ -53,6 +53,8 @@ void AExpOrb::OnOrbOverlap(
 	{
 		return;
 	}
+	
+	playerCharacter->AddExp(ExpValue);
 
 	UE_LOG(LogTemp, Warning, TEXT("EXPORB OVERLAP with: %s"), *OtherActor->GetName());
 
