@@ -6,6 +6,7 @@
 #include "Entity/Character/PlayerData.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h" 
+#include "Entity/IHitable.h"
 #include "PlayerCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExpChangedDelegate, float, CurrentExp, float, MaxExp);
@@ -15,25 +16,27 @@ class UInputMappingContext;
 class UInputAction;
 class UPlayerCameraComponent;
 class UCameraComponent; 
+class UHitableComponent;
 
 UCLASS()
-class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter
+class VAMPIRESURVIVAL_API APlayerCharacter : public ACharacter, public IHitable
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	virtual void TakeDamage(float Damage_, AActor* Attacker) override;
+
+	UFUNCTION()
+	virtual void Death() override;
+	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -52,6 +55,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Stats")
 	FPlayerData PlayerData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player|Component")
+	TObjectPtr<UHitableComponent> HitableComponent;
+	
 	//임시
 	int MaxExp = 100;
 

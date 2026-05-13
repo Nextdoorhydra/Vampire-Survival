@@ -4,9 +4,9 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
+#include "Component/HitableComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -24,6 +24,18 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetUsingAbsoluteRotation(true);
 
 	FollowCamera->SetWorldRotation(FRotator(-60.f, 0.f, 0.f));
+
+	HitableComponent = CreateDefaultSubobject<UHitableComponent>(TEXT("HitableComponent"));
+}
+
+void APlayerCharacter::TakeDamage(float Damage_, AActor* Attacker)
+{
+	HitableComponent->AddHP(-Damage_);
+}
+
+void APlayerCharacter::Death()
+{
+	//죽었을때 처리 ㄱㄱ
 }
 
 void APlayerCharacter::BeginPlay()
@@ -37,6 +49,11 @@ void APlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 		PlayerController->bShowMouseCursor = true;
+	}
+
+	if (HitableComponent)
+	{
+		HitableComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Death);
 	}
 }
 
@@ -94,13 +111,6 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(FVector(0.0f, 1.0f, 0.0f), MovementVector.X);
 	}
 }
-
-/*
-void APlayerCharacter::Look(const FInputActionValue& Value)
-{
-	LookAtMouse();
-}
-*/
 
 void APlayerCharacter::LookAtMouse()
 {
