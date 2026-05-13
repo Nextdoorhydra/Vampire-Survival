@@ -55,6 +55,7 @@ void APlayerCharacter::BeginPlay()
 
 	if (HitableComponent)
 	{
+		HitableComponent->Initialize(PlayerData.MaxHP);
 		HitableComponent->OnDeathEvent.AddDynamic(this, &APlayerCharacter::Death);
 	}
 }
