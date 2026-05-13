@@ -56,17 +56,5 @@ void AExpOrb::OnOrbOverlap(
 	
 	playerCharacter->AddExp(ExpValue);
 
-	UE_LOG(LogTemp, Warning, TEXT("EXPORB OVERLAP with: %s"), *OtherActor->GetName());
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			2.0f,
-			FColor::Yellow,
-			TEXT("EXPORB PICKED")
-		);
-	}
-
 	Destroy();
 }

@@ -5,6 +5,7 @@
 #include "InventoryComponent.generated.h"
 
 class UEquipData;
+class UEquipDatabase;
 
 USTRUCT(BlueprintType)
 struct FOwnedEquip
@@ -18,7 +19,19 @@ struct FOwnedEquip
 	int32 Level = 1;
 };
 
-class UEquipDatabase;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(
+	FOnGetRandomLevelUpOptions,
+	const TArray<UEquipData*>&,
+	Options
+);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
+	FOnOwnedEquipChanged,
+	UEquipData*,
+	EquipData,
+	int32,
+	NewLevel
+);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class VAMPIRESURVIVAL_API UInventoryComponent : public UActorComponent
@@ -28,6 +41,7 @@ class VAMPIRESURVIVAL_API UInventoryComponent : public UActorComponent
 public:
 	UInventoryComponent();
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddOrLevelUpEquip(UEquipData* EquipData);
 
 	bool HasEquip(UEquipData* EquipData) const;
@@ -35,15 +49,23 @@ public:
 	bool IsEquipMaxLevel(UEquipData* EquipData) const;
 
 	const TArray<FOwnedEquip>& GetOwnedEquips() const;
-	TArray<UEquipData*> GetRandomLevelUpOptions() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	TArray<UEquipData*> GetRandomLevelUpOptions();
+
+	UPROPERTY(BlueprintAssignable, Category = "Inventory|Event")
+	FOnGetRandomLevelUpOptions OnGetRandomLevelUpOptions;
+
+	UPROPERTY(BlueprintAssignable, Category = "Inventory|Event")
+	FOnOwnedEquipChanged OnOwnedEquipChanged;
 
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TArray<FOwnedEquip> OwnedEquips;
 
-private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	UEquipDatabase* EquipDatabase = nullptr;
 	

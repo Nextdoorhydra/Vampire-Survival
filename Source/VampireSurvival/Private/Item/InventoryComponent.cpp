@@ -42,7 +42,8 @@ void UInventoryComponent::AddEquip(UEquipData* EquipData)
 	NewEquipData.Level = 1;
 
 	OwnedEquips.Add(NewEquipData);
-	UE_LOG(LogTemp, Warning, TEXT("Equip Added"));
+	
+	OnOwnedEquipChanged.Broadcast(EquipData, NewEquipData.Level);
 }
 
 void UInventoryComponent::LevelUpEquip(UEquipData* EquipData)
@@ -59,7 +60,8 @@ void UInventoryComponent::LevelUpEquip(UEquipData* EquipData)
 			
 			OwnedEquip.Level++;
 			
-			UE_LOG(LogTemp, Warning, TEXT("Equip Level Up"));
+			OnOwnedEquipChanged.Broadcast(EquipData, OwnedEquip.Level);
+			
 			return;
 		}
 	}
@@ -93,13 +95,16 @@ int32 UInventoryComponent::GetEquipLevel(UEquipData* EquipData) const
 	return 0;
 }
 
-TArray<UEquipData*> UInventoryComponent::GetRandomLevelUpOptions() const		//레벨업시 아이템 선택지 던져주는 함수
+TArray<UEquipData*> UInventoryComponent::GetRandomLevelUpOptions()
 {
 	TArray<UEquipData*> Candidates;
 	TArray<UEquipData*> Result;
 
 	if (EquipDatabase == nullptr)
+	{
+		OnGetRandomLevelUpOptions.Broadcast(Result);
 		return Result;
+	}
 
 	for (UEquipData* EquipData : EquipDatabase->LevelUpEquipPool)
 	{
@@ -126,8 +131,11 @@ TArray<UEquipData*> UInventoryComponent::GetRandomLevelUpOptions() const		//레�
 		Candidates.RemoveAt(RandomIndex);
 	}
 
+	OnGetRandomLevelUpOptions.Broadcast(Result);
+
 	return Result;
 }
+
 bool UInventoryComponent::IsEquipMaxLevel(UEquipData* EquipData) const
 {
 	if (EquipData == nullptr)
