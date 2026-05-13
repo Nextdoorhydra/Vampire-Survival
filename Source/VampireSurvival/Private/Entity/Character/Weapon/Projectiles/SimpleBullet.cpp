@@ -33,24 +33,15 @@ void ASimpleBullet::BeginPlay()
 	// 충돌 이벤트 바인딩
 	if (SphereComponent)
 		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ASimpleBullet::OnBulletOverlap);
-
-	UE_LOG(LogTemp, Warning, TEXT("Bullet Ready"));
-
 }
 
 void ASimpleBullet::OnBulletOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
                                     UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
                                     bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != GetInstigator() && OtherActor != this)
-	{
-		auto hitable = Cast<IHitable>(OtherActor);
-		if (AttackBaseComponent == nullptr && hitable != nullptr)
-		{
-			AttackBaseComponent->HandleAttackOverlap(10, hitable, this);
+	auto hitable = Cast<IHitable>(OtherActor);
+	if (AttackBaseComponent == nullptr || hitable == nullptr) return;
 
-			UE_LOG(LogTemp, Warning, TEXT("Bullet Overlap"));
-			Destroy();
-		}
-	}
+	AttackBaseComponent->HandleAttackOverlap(Damage, hitable, this);
+	Destroy();
 }

@@ -40,8 +40,6 @@ void UDropComponents::TryDropItem()
 		spawnLocation,
 		spawnRotation
 	);
-
-	UE_LOG(LogTemp, Warning, TEXT("Item Dropped"));
 }
 
 

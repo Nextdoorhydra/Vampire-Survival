@@ -18,6 +18,8 @@ void AThrowingDagger::OnAttacking()
 		return;
 	}
 
+	LookAt();
+
 	const FRichCurve& RichCurve = SpawnTimingCurve->FloatCurve;
     
 	const int32 TotalKeys = RichCurve.Keys.Num();
@@ -34,15 +36,38 @@ void AThrowingDagger::OnAttacking()
 		bool bIsLastKey = (i >= SpawnCount -1);
 
 		FTimerHandle TempHandle;
-		GetWorldTimerManager().SetTimer(TempHandle, [this, bIsLastKey]()
+		TWeakObjectPtr WeakThis(this);
+		GetWorldTimerManager().SetTimer(TempHandle, [WeakThis, bIsLastKey]()
 		{
-			if (!IsValid(this)) return;
-			RequestBulletSpawn(GetRandomSpawnTransform());
+			
+			if (!WeakThis.IsValid()) return;
+			WeakThis->RequestBulletSpawn(WeakThis->GetRandomSpawnTransform());
 			if (bIsLastKey)
-				this->FinishAttack();
+				WeakThis->FinishAttack();
 			
 		}, SpawnDelay, false);
 	}
+}
+
+void AThrowingDagger::ApplyLevelSpec(int InLevel)
+{
+	//TODO 데이터 에셋 받아서 증가량 적용
+	switch (InLevel)
+	{
+	case 2: Damage = 3; break;
+	case 3: DaggerCount = 2; break;
+	case 4: FireDelay = 0.5f; break;
+	case 5: DaggerCount = 4; break;
+	default: break;
+	}
+}
+
+void AThrowingDagger::LookAt()
+{
+	Super::LookAt();
+	if (!GetOwner()) return;
+	
+	SetActorRotation(GetOwner()->GetActorRotation());
 }
 
 FTransform AThrowingDagger::GetRandomSpawnTransform() const

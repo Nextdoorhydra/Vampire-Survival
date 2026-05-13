@@ -17,11 +17,12 @@ public:
 	AProjectileWeaponBase();
 	
 	void RequestBulletSpawn(FTransform SpawnTransform);
-
-	//TODO : 마우스 방향으로 바라보게 할 필요 있음.
 	
 protected:
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Bullet")
-	TSubclassOf<ABulletBase> BulletClass; 
+	TSubclassOf<ABulletBase> BulletClass;
+
+	virtual void LookAt(){}
+
 };

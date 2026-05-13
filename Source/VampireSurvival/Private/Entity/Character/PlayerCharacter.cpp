@@ -6,7 +6,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -16,19 +15,15 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 800.0f;
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	CameraBoom->bInheritPitch = false;
-	CameraBoom->bInheritYaw = false;
-	CameraBoom->bInheritRoll = false;
-	CameraBoom->bDoCollisionTest = false;
-
+	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->SetupAttachment(RootComponent);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	FollowCamera->SetUsingAbsoluteLocation(true);
+	FollowCamera->SetUsingAbsoluteRotation(true);
+
+	FollowCamera->SetWorldRotation(FRotator(-60.f, 0.f, 0.f));
 }
 
 void APlayerCharacter::BeginPlay()
@@ -50,6 +45,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	LookAtMouse();
+	// 거리 800, 각도 -60도기준 계산 거리
+	// X: 뒤로 400 (-800 * cos(60))
+	// Z: 위로 692.82 (800 * sin(60))
+	FVector CameraOffset = FVector(-400.f, 0.f, 692.82f);
+	
+	FollowCamera->SetWorldLocation(GetActorLocation() + CameraOffset);
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

@@ -25,9 +25,12 @@ void AProjectileWeaponBase::RequestBulletSpawn(FTransform SpawnTransform)
 	SpawnParams.Instigator = GetInstigator();         // 무기를 든 캐릭터가 가해자임
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // 일단 무조건 스폰
 
-	ABulletBase* NewBullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, SpawnTransform);
+	//ABulletBase* NewBullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, SpawnTransform);
+	ABulletBase* NewBullet = GetWorld()->SpawnActorDeferred<ABulletBase>(BulletClass, SpawnTransform, this);
 
+	if (!NewBullet) return;
 	NewBullet->BulletSpawn(this, Damage, KnockBack, 1.f);
+	NewBullet->FinishSpawning(SpawnTransform);
 }
 
 

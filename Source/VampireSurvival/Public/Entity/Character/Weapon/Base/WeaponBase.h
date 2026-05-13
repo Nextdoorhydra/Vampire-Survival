@@ -26,10 +26,14 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
+	virtual void Spawn(AActor* InOwner);
 
 	//무기 kill count 올리려면?
 	
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USceneComponent> DefaultSceneRoot;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|State")
 	EWeaponState CurrentState = EWeaponState::Idle;
@@ -38,6 +42,7 @@ protected:
 
 	virtual void OnAttacking(){}
 	void FinishAttack();
+	virtual void ApplyLevelSpec(int InLevel);
 
 	//무기용 data asset 필요한듯?
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")
