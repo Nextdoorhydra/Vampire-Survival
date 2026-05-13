@@ -22,12 +22,12 @@ protected:
 
 	TArray<TObjectPtr<AOrbitObject>> OrbitObjects;
     
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Weapon|Stats")
 	TSubclassOf<AOrbitObject> OrbitClass;
-    
-	UPROPERTY(EditAnywhere)
+	
+	UPROPERTY(EditAnywhere, Category = "Weapon|Stats")
 	int32 OrbitObjectCount = 3;
     
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Weapon|Stats")
 	float OrbitFloatingDistance = 300;
 };

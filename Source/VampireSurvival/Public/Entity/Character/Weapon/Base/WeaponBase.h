@@ -14,8 +14,6 @@ enum class EWeaponState : uint8
 	Delay       UMETA(DisplayName = "Delay"),
 };
 
-//플레이어로 부터 Tick 을 받아오게 함
-
 UCLASS(Abstract)
 class VAMPIRESURVIVAL_API AWeaponBase : public AActor
 {
@@ -34,6 +32,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Stats")
+	TObjectPtr<class UEquipData> EquipData;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|State")
 	EWeaponState CurrentState = EWeaponState::Idle;
@@ -46,8 +47,7 @@ protected:
 	virtual void FinishAttack();
 	
 	virtual void ApplyLevelSpec(int InLevel);
-
-	//무기용 data asset 필요한듯?
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Stats")
 	float FireDelay = 1.0f;
 	
