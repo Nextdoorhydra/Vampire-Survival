@@ -9,6 +9,7 @@
 #include "Entity/IHitable.h"
 #include "PlayerCharacter.generated.h"
 
+class AWeaponBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnExpChangedDelegate, float, CurrentExp, float, MaxExp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLevelUpDelegate, int, Level);
 
@@ -42,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddExp(float InExp);
+
+	UFUNCTION(BlueprintCallable)
+	void AddWeapon(TSubclassOf<AWeaponBase> weapon);
 	
 	UPROPERTY(BlueprintAssignable, Category = "Player|Events")
 	FOnExpChangedDelegate OnExpChangedDelegate;

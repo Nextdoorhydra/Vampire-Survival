@@ -7,6 +7,7 @@
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
 #include "Component/HitableComponent.h"
+#include "Entity/Character/Weapon/Base/WeaponBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Item/InventoryComponent.h"
 
@@ -95,6 +96,17 @@ void APlayerCharacter::AddExp(float InExp)
 	LevelUp();
 	PlayerData.Exp -= MaxExp;
 	OnExpChangedDelegate.Broadcast(PlayerData.Exp, MaxExp);
+}
+
+void APlayerCharacter::AddWeapon(TSubclassOf<AWeaponBase> weapon)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;                        
+	SpawnParams.Instigator = GetInstigator();         
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	auto NewWeapon = GetWorld()->SpawnActorDeferred<AWeaponBase>(weapon, GetTransform(), this);
+	NewWeapon->Spawn(this);
 }
 
 TObjectPtr<UHitableComponent> APlayerCharacter::GetHitableComponent()
