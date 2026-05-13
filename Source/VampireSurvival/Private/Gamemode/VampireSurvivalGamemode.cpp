@@ -55,6 +55,7 @@ void AVampireSurvivalGamemode::StartRun()
 void AVampireSurvivalGamemode::UpdateRunTime()
 {
 	ElapsedTime += 1.f;
+	OnRunElapsedTimeChanged.Broadcast(ElapsedTime);
 
 	if (ElapsedTime >= RunDurationSeconds)
 	{
