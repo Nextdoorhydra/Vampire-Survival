@@ -45,8 +45,8 @@ void UUIPlayer::OnLevelChanged(int32 NewLevel)
 {
 	if (Text_Level)
 	{
-		FText FormattedGold = FText::Format(FText::FromString(TEXT("Lv: {0}")), FText::AsNumber(NewLevel));
-		Text_Gold->SetText(FormattedGold);
+		FText FormattedLevel = FText::Format(FText::FromString(TEXT("Lv: {0}")), FText::AsNumber(NewLevel));
+		Text_Level->SetText(FormattedLevel);
 	}
 }
 
