@@ -32,6 +32,12 @@ public:
 	void OnTimerChanged(float NewTime);
 
 protected:
+	// 바인드 코드
+	virtual void NativeConstruct() override;
+	
+	UPROPERTY()
+	TObjectPtr<class UUIPPlayer> Presenter;
+	
 	virtual TOptional<FUIInputConfig> GetDesiredInputConfig() const override;
 	
 	// UMG 에디터에서 동일한 이름으로 위젯을 생성해야 바인딩됩니다.

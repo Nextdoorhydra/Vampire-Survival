@@ -1,6 +1,22 @@
 ﻿#include "UI/UIPlayer.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "Entity/Character/PlayerCharacter.h"
+#include "UI/Presenter/UIPPlayer.h"
+
+void UUIPlayer::NativeConstruct()
+ {
+ 	Super::NativeConstruct();
+ 
+ 	Presenter = NewObject<UUIPPlayer>(this);
+ 
+ 	APlayerCharacter* PlayerChar = Cast<APlayerCharacter>(GetOwningPlayerPawn());
+ 
+ 	if (Presenter && PlayerChar)
+ 	{
+ 		Presenter->Bind(PlayerChar, this);
+ 	}
+ }
 
 TOptional<FUIInputConfig> UUIPlayer::GetDesiredInputConfig() const
 {
