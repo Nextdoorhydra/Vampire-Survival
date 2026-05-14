@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Item/InventoryComponent.h"
-#include "Item/EquipDatabase.h"
-#include "Item/EquipData.h"
+#include "Component/InventoryComponent.h"
+#include "DataAsset/EquipDatabase.h"
+#include "DataAsset/EquipData.h"
 
 // Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()

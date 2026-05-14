@@ -1,9 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Entity/Character/Weapon/Instances/ThrowingDagger.h"
+#include "Equipment/Weapon/Instances/ThrowingDagger.h"
 #include "Curves/CurveVector.h"
-#include "Item/EquipData.h"
+#include "DataAsset/EquipData.h"
 
 
 AThrowingDagger::AThrowingDagger()

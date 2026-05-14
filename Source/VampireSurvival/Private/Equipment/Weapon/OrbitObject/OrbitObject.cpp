@@ -1,4 +1,4 @@
-﻿#include "Entity/Character/Weapon/OrbitObject/OrbitObject.h"
+﻿#include "Equipment/Weapon/OrbitObject/OrbitObject.h"
 
 AOrbitObject::AOrbitObject()
 {

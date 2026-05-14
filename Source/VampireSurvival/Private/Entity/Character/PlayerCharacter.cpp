@@ -7,9 +7,9 @@
 #include "InputAction.h"
 #include "Camera/CameraComponent.h"
 #include "Component/HitableComponent.h"
-#include "Entity/Character/Weapon/Base/WeaponBase.h"
+#include "Equipment/Weapon/Base/WeaponBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Item/InventoryComponent.h"
+#include "Component/InventoryComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {

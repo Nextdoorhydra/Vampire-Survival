@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Entity/Character/Weapon/Base/ProjectileWeaponBase.h"
+#include "Equipment/Weapon/Base/ProjectileWeaponBase.h"
 #include "ThrowingDagger.generated.h"
 
 class UCurveVector;
