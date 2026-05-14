@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Entity/IHitable.h"
+#include "Entity/IPoolable.h"
 #include "GameFramework/Character.h"
 
 #include "EnemyBase.generated.h"
@@ -11,9 +12,10 @@ class UHitableComponent;
 class UAttackBaseComponent;
 class UPrimitiveComponent;
 class USphereComponent;
+class UPoolableComponent;
 
 UCLASS()
-class VAMPIRESURVIVAL_API AEnemyBase : public ACharacter, public IHitable
+class VAMPIRESURVIVAL_API AEnemyBase : public ACharacter, public IHitable, public IPoolable
 {
 	GENERATED_BODY()
 
@@ -32,6 +34,11 @@ public:
 	virtual void Death() override;
 
 	void InitializeFromData(const UEnemyDataAsset* EnemyData);
+	
+	
+	// Pooling
+	virtual void ReturnToPool() override;
+	virtual void GetFromPool() override;
 
 protected:
 	UFUNCTION()
@@ -49,6 +56,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
 	TObjectPtr<UAttackBaseComponent> AttackComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
+	TObjectPtr<UPoolableComponent> PoolableComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy|Component")
 	TObjectPtr<USphereComponent> SphereComponent;
