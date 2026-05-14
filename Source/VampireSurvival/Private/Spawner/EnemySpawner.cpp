@@ -10,6 +10,10 @@
 #include "DataAsset/WaveDataAsset.h"
 #include "Entity/Enemy/EnemyBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "PoolingManager/PoolSubsystem.h"
+
+#include "Component/PoolableComponent.h"
+
 
 // Sets default values
 AEnemySpawner::AEnemySpawner()
@@ -28,6 +32,19 @@ void AEnemySpawner::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Player character not found"));
 	}
+
+	if (!PrewarmEnemyClass || PrewarmCount <= 0)
+	{
+		return;
+	}
+
+	UPoolSubsystem* PoolSubsystem = GetWorld()->GetSubsystem<UPoolSubsystem>();
+	if (!PoolSubsystem)
+	{
+		return;
+	}
+
+	PoolSubsystem->PrewarmPool(PrewarmEnemyClass, PrewarmCount);
 }
 
 void AEnemySpawner::Tick(float DeltaTime)
@@ -68,13 +85,24 @@ void AEnemySpawner::Tick(float DeltaTime)
 
 void AEnemySpawner::SetWaveData(UWaveDataAsset* NewWaveData)
 {
+	if (CurrentWaveData == NewWaveData)
+	{
+		return;
+	}
 	CurrentWaveData = NewWaveData;
 	TimeSinceLastSpawn = 0.f;
 	bBossSpawned = false;
 
+	if (!CurrentWaveData)
+	{
+		return;
+	}
+
 	if (CurrentWaveData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner: Wave data set. WaveIndex=%d"), CurrentWaveData->WaveIndex);
+		UE_LOG(LogTemp, Warning, TEXT("[Prewarm] WaveIndex=%d / Segments=%d"),
+		       CurrentWaveData->WaveIndex,
+		       CurrentWaveData->SpawnSegments.Num());
 	}
 }
 
@@ -144,6 +172,12 @@ const FEnemySpawnGroup* AEnemySpawner::SelectEnemySpawnGroup(const FSpawnSegment
 
 	for (const FEnemySpawnGroup& Group : Segment.EnemyGroups)
 	{
+		// 풀링체크용
+		UE_LOG(LogTemp, Warning, TEXT("[Prewarm] EnemyData=%s / EnemyClass=%s / CountPerSpawn=%d"),
+		       *GetNameSafe(Group.EnemyData),
+		       *GetNameSafe(Group.EnemyData ? Group.EnemyData->EnemyClass.Get() : nullptr),
+		       Group.CountPerSpawn);
+
 		if (!Group.EnemyData || Group.SpawnWeight <= 0.f)
 		{
 			continue;
@@ -192,23 +226,39 @@ void AEnemySpawner::SpawnEnemyFromData(class UEnemyDataAsset* EnemyData, int32 C
 			SpawnLocation.Z = DefaultEnemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 		}
 
-		FActorSpawnParameters SpawnParams;
+		// FActorSpawnParameters SpawnParams;
+		//
+		// SpawnParams.Owner = this;
+		// SpawnParams.SpawnCollisionHandlingOverride =
+		// 	ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		//
+		// AEnemyBase* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBase>(
+		// 	EnemyData->EnemyClass,
+		// 	SpawnLocation,
+		// 	FRotator::ZeroRotator,
+		// 	SpawnParams
+		// );
 
-		SpawnParams.Owner = this;
-		SpawnParams.SpawnCollisionHandlingOverride =
-			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+		UPoolSubsystem* PoolSubsystem = GetWorld()->GetSubsystem<UPoolSubsystem>();
+		if (!PoolSubsystem)
+		{
+			return;
+		}
 
-		AEnemyBase* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyBase>(
+		AActor* PooledActor = PoolSubsystem->GetActorFromPool(
 			EnemyData->EnemyClass,
-			SpawnLocation,
-			FRotator::ZeroRotator,
-			SpawnParams
+			FTransform(FRotator::ZeroRotator, SpawnLocation)
 		);
+
+		AEnemyBase* SpawnedEnemy = Cast<AEnemyBase>(PooledActor);
 
 		if (SpawnedEnemy)
 		{
 			SpawnedEnemy->InitializeFromData(EnemyData);
-			SpawnedEnemiesList.Add(SpawnedEnemy);
+			SpawnedEnemiesList.AddUnique(SpawnedEnemy);
+
+			// 풀링 체크용
+			UE_LOG(LogTemp, Warning, TEXT("SpawnedEnemiesList Count After Spawn: %d"), SpawnedEnemiesList.Num());
 		}
 	}
 }
@@ -272,10 +322,28 @@ bool AEnemySpawner::FindSpawnLocation(FVector& SpawnLocation) const
 
 void AEnemySpawner::CleanupInvalidEnemies()
 {
+	// 풀링체크용
+	const int32 BeforeCount = SpawnedEnemiesList.Num();
+
 	SpawnedEnemiesList.RemoveAll([](const TObjectPtr<AActor>& Enemy)
 	{
-		return !IsValid(Enemy);
+		if (!IsValid(Enemy))
+		{
+			return true;
+		}
+
+		const UPoolableComponent* PoolableComponent = Enemy->FindComponentByClass<UPoolableComponent>();
+		if (PoolableComponent && PoolableComponent->GetPoolStatus())
+		{
+			return true;
+		}
+
+		return false;
 	});
+
+	// 풀링체크용
+	const int32 AfterCount = SpawnedEnemiesList.Num();
+	UE_LOG(LogTemp, Warning, TEXT("Cleanup SpawnedEnemiesList: %d -> %d"), BeforeCount, AfterCount);
 }
 
 void AEnemySpawner::SetElapsedTime(float InElapsedTime)

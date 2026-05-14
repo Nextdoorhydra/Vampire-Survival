@@ -54,6 +54,13 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> SpawnedEnemiesList;
 
+	// Pool init
+	UPROPERTY(EditAnywhere, Category = "Spawner|Pool")
+	TSubclassOf<AEnemyBase> PrewarmEnemyClass;
+
+	UPROPERTY(EditAnywhere, Category = "Spawner|Pool")
+	int32 PrewarmCount = 300;
+
 	// Spawner 필요 요소
 	// 1. 스폰 주기 (World timer 연동 해야하나?)
 	// 2. 스폰 반경 (플레이어 반경 n미터 내, 너무 가까운 곳은 X)

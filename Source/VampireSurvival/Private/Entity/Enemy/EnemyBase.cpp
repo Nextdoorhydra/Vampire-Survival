@@ -2,37 +2,41 @@
 
 #include "DataAsset/EnemyDataAsset.h"
 #include "Component/HitableComponent.h"
+#include "Component/PoolableComponent.h"
 #include "Component/SimpleAttackComponent.h"
 #include "Components/SphereComponent.h"
 #include "Entity/IHitable.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/Engine.h"
+#include "PoolingManager/PoolSubsystem.h"
 
 AEnemyBase::AEnemyBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	// Collision sphere used to detect contact damage targets
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("EnemyAttackCol"));
-	SphereComponent->SetupAttachment(RootComponent); 
+	SphereComponent->SetupAttachment(RootComponent);
 
 	// Component that manages HP and death events
 	HitableComponent = CreateDefaultSubobject<UHitableComponent>(TEXT("HitableComponent"));
 	// Component that handles attack logic
 	AttackComponent = CreateDefaultSubobject<USimpleAttackComponent>(TEXT("AttackComponent"));
+	// Component that managing Pooling
+	PoolableComponent = CreateDefaultSubobject<UPoolableComponent>(TEXT("PoolableComponent"));
 }
 
 void AEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (SphereComponent)
 	{
 		SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBase::OnAttackBeginOverlap);
 		SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AEnemyBase::OnAttackEndOverlap);
 	}
 	if (HitableComponent)
-		
+
 	{
 		HitableComponent->Initialize(MaxHP);
 		HitableComponent->OnDeathEvent.AddDynamic(this, &AEnemyBase::Death);
@@ -51,7 +55,7 @@ void AEnemyBase::Tick(float DeltaTime)
 	{
 		return;
 	}
-	
+
 	// Calculate movement direction toward the target
 	FVector Direction = TargetActor->GetActorLocation() - GetActorLocation();
 	Direction.Z = 0.f;
@@ -75,6 +79,16 @@ void AEnemyBase::TakeDamage(float Damage_, AActor* Attacker)
 
 void AEnemyBase::Death()
 {
+	if (UWorld* World = GetWorld())
+	{
+		if (UPoolSubsystem* PoolSubsystem = World->GetSubsystem<UPoolSubsystem>())
+		{
+			PoolSubsystem->ReturnActorToPool(this);
+			return;
+		}
+	}
+
+	// 못가져오면 Destroy시킴
 	Destroy();
 }
 
@@ -94,7 +108,6 @@ void AEnemyBase::InitializeFromData(const UEnemyDataAsset* EnemyData)
 	{
 		HitableComponent->Initialize(MaxHP);
 	}
-	
 }
 
 void AEnemyBase::OnAttackBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -139,5 +152,39 @@ void AEnemyBase::ApplyContactDamage(float DeltaTime)
 		}
 
 		AttackComponent->HandleAttackOverlap(ContactDamage * DeltaTime, Hitable, this);
+	}
+}
+
+
+// Pooling
+
+void AEnemyBase::GetFromPool()
+{
+	ContactDamageTargets.Empty();
+
+	if (PoolableComponent)
+	{
+		PoolableComponent->SetPoolStatus(false);
+	}
+
+	if (HitableComponent)
+	{
+		HitableComponent->Initialize(MaxHP);
+	}
+
+	TargetActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+}
+
+void AEnemyBase::ReturnToPool()
+{
+	ContactDamageTargets.Empty();
+	TargetActor = nullptr;
+
+	if (PoolableComponent)
+	{
+		PoolableComponent->SetPoolStatus(true);
+
+		// 풀링체크용
+		UE_LOG(LogTemp, Warning, TEXT("Enemy Returned To Pool: %s"), *GetName());
 	}
 }
