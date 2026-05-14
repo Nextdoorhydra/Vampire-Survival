@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Entity/Character/Weapon/OrbitObject/SimpleOrbitObject.h"
+#include "Equipment/Weapon/OrbitObject/SimpleOrbitObject.h"
 
 #include "Component/SimpleAttackComponent.h"
 #include "Components/SphereComponent.h"

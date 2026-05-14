@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/TimelineComponent.h"
-#include "Entity/Character/Weapon/Base/OrbitWeaponBase.h"
+#include "Equipment/Weapon/Base/OrbitWeaponBase.h"
 #include "Bible.generated.h"
 
 class AOrbitObject;

@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Entity/Character/Weapon/Base/OrbitWeaponBase.h"
-#include "Entity/Character/Weapon/OrbitObject/OrbitObject.h"
+#include "Equipment/Weapon/Base/OrbitWeaponBase.h"
+#include "Equipment/Weapon/OrbitObject/OrbitObject.h"
 
 
 void AOrbitWeaponBase::CheckAndSpawnOrbitObject()

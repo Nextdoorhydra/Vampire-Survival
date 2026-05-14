@@ -1,10 +1,10 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Entity/Character/Weapon/Instances/Bible.h"
+#include "Equipment/Weapon/Instances/Bible.h"
 
 #include "Components/TimelineComponent.h"
-#include "Item/EquipData.h"
+#include "DataAsset/EquipData.h"
 
 
 // Sets default values
